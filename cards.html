@@ -210,6 +210,93 @@
   aside::-webkit-scrollbar { width: 4px; }
   aside::-webkit-scrollbar-track { background: transparent; }
   aside::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
+
+  /* ===== MOBILE ELEMENTS ===== */
+  .mobile-menu-btn {
+    display: none; width: 40px; height: 40px;
+    background: var(--bg-card); border: 1.5px solid var(--border-strong);
+    border-radius: 10px; cursor: pointer; align-items: center; justify-content: center;
+    color: var(--text); flex-shrink: 0; transition: background 0.15s;
+  }
+  .mobile-menu-btn:hover { background: var(--border); }
+  .sidebar-backdrop {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45); z-index: 49;
+  }
+  .sidebar-backdrop.open { display: block; animation: cbd 0.22s ease; }
+  @keyframes cbd { from { opacity: 0; } to { opacity: 1; } }
+  .sidebar-header {
+    display: none; align-items: center; justify-content: space-between;
+    padding: 14px 16px 12px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+  }
+  .sidebar-header-title { font-size: 16px; font-weight: 700; }
+  .sidebar-close-btn {
+    width: 36px; height: 36px; background: var(--border); border: none; border-radius: 10px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    color: var(--text); transition: background 0.15s;
+  }
+  .sidebar-close-btn:hover { background: var(--border-strong); }
+  .mobile-bottom-bar {
+    display: none; position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--bg-card); border-top: 1px solid var(--border-strong);
+    padding: 12px 16px; padding-bottom: max(12px, env(safe-area-inset-bottom));
+    z-index: 40; gap: 10px; align-items: center;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    .nav-inner { padding: 0 16px; height: 52px; }
+    .logo { font-size: 15px; }
+    .nav-links > a, .nav-links > span.nav-auth { display: none; }
+    .mobile-menu-btn { display: flex; }
+    .layout { grid-template-columns: 1fr; }
+    aside {
+      position: fixed !important;
+      left: -100%; top: 0;
+      width: min(300px, 84vw); height: 100vh; height: 100dvh;
+      z-index: 50; background: var(--bg-card);
+      border-right: 1px solid var(--border-strong);
+      overflow: hidden; padding: 0;
+      padding-top: env(safe-area-inset-top);
+      transition: left 0.28s cubic-bezier(0.25,0.46,0.45,0.94), box-shadow 0.28s ease;
+    }
+    aside.open { left: 0; box-shadow: 8px 0 40px rgba(0,0,0,0.18); }
+    .sidebar-header { display: flex; }
+    .quick-add-wrap, .cat-tabs, .sidebar-search { flex-shrink: 0; }
+    .card-list { flex: 1; overflow-y: auto; padding-bottom: 24px; }
+    .card-item { min-height: 44px; padding: 11px 12px; }
+    main { padding: 20px 16px 96px; }
+    .content-header { flex-direction: column; align-items: stretch; gap: 10px; margin-bottom: 16px; }
+    .card-title-main { font-size: 22px; }
+    .header-actions { flex-direction: column; align-items: stretch; gap: 8px; }
+    .mode-toggle { align-self: stretch; }
+    .mode-btn { flex: 1; padding: 10px 8px; min-height: 42px; text-align: center; }
+    .stats-bar { padding: 12px 14px; gap: 8px; }
+    .stat-value { font-size: 18px; }
+    .stat-label { font-size: 10px; }
+    .toolbar { flex-direction: column; gap: 10px; padding: 14px; }
+    .toolbar-hint { font-size: 13px; }
+    .toolbar-actions { width: 100%; gap: 8px; }
+    .toolbar-actions .tool-btn { flex: 1; justify-content: center; min-height: 44px; font-size: 13px; }
+    .article-card { padding: 24px 20px; }
+    .article-body { font-size: 17px; line-height: 2.1; }
+    .create-form-wrap { max-width: 100%; }
+    .create-form-wrap h2 { font-size: 22px; margin-bottom: 20px; }
+    .type-selector { gap: 6px; }
+    .type-btn { padding: 7px 12px; font-size: 12px; }
+    .quiz-question { font-size: 17px; }
+    .ox-btn { width: 90px; height: 90px; font-size: 36px; }
+    .ox-buttons { gap: 20px; }
+    .subj-model-answer { font-size: 16px; padding: 16px 18px; }
+    .mobile-bottom-bar { display: flex; }
+    .toast { bottom: 84px; }
+  }
+  @media (max-width: 480px) {
+    .card-title-main { font-size: 20px; }
+    .article-body { font-size: 16px; }
+    .article-card { padding: 20px 16px; }
+  }
 </style>
 </head>
 <body>
@@ -222,11 +309,28 @@
       <a href="cards.html" class="active">커스텀 카드</a>
       <span class="nav-auth"><a href="login.html">로그인</a></span>
     </div>
+    <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="카드 목록 열기">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
   </div>
 </nav>
 
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
 <div class="layout">
   <aside id="sidebar">
+    <div class="sidebar-header">
+      <span class="sidebar-header-title">커스텀 카드</span>
+      <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="닫기">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
     <div class="quick-add-wrap">
       <input class="quick-add-input" id="quickAddInput" placeholder="제목 입력 후 Enter 또는 + 클릭" type="text">
       <button class="quick-add-btn" id="quickAddBtn" title="카드 추가">+</button>
@@ -253,6 +357,7 @@
   </main>
 </div>
 
+<div class="mobile-bottom-bar" id="mobileBottomBar"></div>
 <div class="toast" id="toast"></div>
 
 <script type="module">
@@ -396,6 +501,8 @@
     state.mode = 'edit';
     renderCardList();
     renderMain();
+    if (window.innerWidth <= 768) closeSidebar();
+    if (window.innerWidth <= 768) window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   // === 생성 폼 ===
@@ -1379,6 +1486,68 @@
   window.hideAll = hideAll;
   window.resetOX = resetOX;
   window.resetSubjective = resetSubjective;
+
+  // ===== 모바일 사이드바 =====
+  function openSidebar() {
+    document.getElementById('sidebar').classList.add('open');
+    document.getElementById('sidebarBackdrop').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarBackdrop').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.contains('open') ? closeSidebar() : openSidebar();
+  }
+  document.getElementById('mobileMenuBtn').onclick = toggleSidebar;
+  document.getElementById('sidebarBackdrop').onclick = closeSidebar;
+  document.getElementById('sidebarCloseBtn').onclick = closeSidebar;
+
+  // ===== 모바일 하단 바 =====
+  function updateMobileBottomBar() {
+    const bar = document.getElementById('mobileBottomBar');
+    if (!bar) return;
+
+    if (!state.isLoggedIn || !state.currentCardId || state.mode === 'create') {
+      bar.innerHTML = `
+        <button onclick="toggleSidebar()" style="flex:1;min-height:48px;background:var(--text);color:white;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          카드 목록 열기
+        </button>`;
+      return;
+    }
+
+    const card = findCard(state.currentCardId);
+    if (!card) return;
+    const ct = card.card_type || 'fill-blank';
+    const blankKey = 'custom-' + card.id;
+    const blankCount = (ct === 'fill-blank' || ct === 'table') ? (state.blanks[blankKey] || []).length : 0;
+    const canStudy = ct === 'ox' || ct === 'subjective' || blankCount > 0;
+
+    if (state.mode === 'edit') {
+      bar.innerHTML = `
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:11px;color:var(--text-mute);font-weight:600;letter-spacing:0.02em;margin-bottom:1px;">선택된 카드</div>
+          <div style="font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(card.title)}</div>
+        </div>
+        <button onclick="${canStudy ? "switchMode('study')" : ''}" ${!canStudy ? 'disabled' : ''} style="min-height:48px;padding:0 20px;background:${canStudy ? 'var(--brand)' : 'var(--border-strong)'};color:${canStudy ? 'white' : 'var(--text-mute)'};border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:${canStudy ? 'pointer' : 'not-allowed'};font-family:inherit;white-space:nowrap;flex-shrink:0;">
+          암기 시작
+        </button>`;
+    } else {
+      bar.innerHTML = `
+        <button onclick="switchMode('edit')" style="flex:1;min-height:48px;background:var(--border);color:var(--text);border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">편집으로</button>
+        <button onclick="switchMode('study')" style="flex:1;min-height:48px;background:var(--brand);color:white;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">다시 풀기</button>`;
+    }
+  }
+
+  window.toggleSidebar = toggleSidebar;
+
+  // mainArea 변경 감지 → 하단 바 자동 업데이트
+  const mainArea = document.getElementById('mainArea');
+  new MutationObserver(() => updateMobileBottomBar()).observe(mainArea, { childList: true });
+  updateMobileBottomBar();
 </script>
 </body>
 </html>
