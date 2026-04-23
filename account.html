@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>마이페이지 | 산업재산권법 조문연습</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F9FAFB; --bg-card: #FFFFFF; --text: #191F28; --text-sub: #4E5968;
+    --text-mute: #8B95A1; --border: #F2F4F6; --border-strong: #E5E8EB;
+    --brand: #3182F6; --brand-sub: #E8F3FF; --brand-hover: #1B64DA;
+    --success: #00C471; --success-sub: #E6F9F0;
+    --danger: #F04452; --danger-sub: #FFEBED;
+    --radius: 14px; --radius-lg: 20px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Pretendard', -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; -webkit-font-smoothing: antialiased; letter-spacing: -0.01em; min-height: 100vh; }
+  nav { background: rgba(249,250,251,0.85); backdrop-filter: saturate(180%) blur(12px); border-bottom: 1px solid var(--border); }
+  .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 64px; max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+  .logo { font-size: 18px; font-weight: 800; color: var(--text); text-decoration: none; letter-spacing: -0.03em; }
+  .nav-links { display: flex; gap: 28px; align-items: center; }
+  .nav-links a { color: var(--text-sub); text-decoration: none; font-size: 15px; font-weight: 500; }
+
+  main { max-width: 640px; margin: 40px auto; padding: 0 24px 80px; }
+
+  .page-title { font-size: 28px; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 28px; }
+
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 32px; margin-bottom: 16px; }
+  .card-title { font-size: 13px; font-weight: 700; color: var(--text-mute); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 20px; }
+
+  /* 프로필 */
+  .profile-row { display: flex; align-items: center; gap: 16px; }
+  .avatar { width: 52px; height: 52px; border-radius: 50%; background: var(--brand-sub); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; color: var(--brand); flex-shrink: 0; }
+  .profile-info { flex: 1; }
+  .profile-email { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+  .profile-since { font-size: 13px; color: var(--text-mute); }
+
+  /* 통계 */
+  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .stat-box { background: var(--bg); border-radius: 12px; padding: 16px; text-align: center; }
+  .stat-box-value { font-size: 28px; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; display: block; margin-bottom: 4px; }
+  .stat-box-value.brand { color: var(--brand); }
+  .stat-box-label { font-size: 12px; color: var(--text-mute); font-weight: 500; }
+  .law-stats { margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .law-stat-row { display: flex; align-items: center; gap: 12px; }
+  .law-stat-name { font-size: 13px; font-weight: 600; color: var(--text-sub); width: 80px; flex-shrink: 0; }
+  .law-stat-bar-wrap { flex: 1; background: var(--border); border-radius: 4px; height: 6px; overflow: hidden; }
+  .law-stat-bar { height: 100%; border-radius: 4px; background: var(--brand); transition: width 0.6s ease; }
+  .law-stat-count { font-size: 13px; font-weight: 600; color: var(--text-mute); width: 28px; text-align: right; }
+
+  /* 비밀번호 변경 */
+  .form-group { margin-bottom: 16px; }
+  .form-label { display: block; font-size: 13px; font-weight: 600; color: var(--text-sub); margin-bottom: 8px; }
+  .form-input { width: 100%; padding: 12px 14px; border: 1px solid var(--border-strong); border-radius: 10px; font-size: 15px; font-family: inherit; background: var(--bg-card); color: var(--text); outline: none; transition: all 0.15s; }
+  .form-input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(49,130,246,0.1); }
+
+  /* 버튼 */
+  .btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 20px; font-size: 14px; font-weight: 700; border-radius: 10px; border: none; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+  .btn-primary { background: var(--brand); color: white; }
+  .btn-primary:hover:not(:disabled) { background: var(--brand-hover); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-outline { background: white; color: var(--text); border: 1px solid var(--border-strong); }
+  .btn-outline:hover { border-color: var(--text-mute); }
+  .btn-danger { background: white; color: var(--danger); border: 1px solid rgba(240,68,82,0.3); }
+  .btn-danger:hover { background: var(--danger-sub); border-color: var(--danger); }
+  .btn-full { width: 100%; }
+  .btn-row { display: flex; gap: 10px; }
+
+  /* 알림 */
+  .alert { padding: 12px 14px; border-radius: 9px; font-size: 14px; margin-bottom: 16px; display: none; }
+  .alert.show { display: block; }
+  .alert.success { background: var(--success-sub); color: #006B3C; border: 1px solid rgba(0,196,113,0.2); }
+  .alert.error { background: var(--danger-sub); color: #B01826; border: 1px solid rgba(240,68,82,0.15); }
+
+  /* 구분선 */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+  /* 로딩 */
+  .skeleton { background: var(--border); border-radius: 6px; animation: pulse 1.2s ease infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+  /* 위험 구역 */
+  .danger-zone { border-color: rgba(240,68,82,0.2); }
+  .danger-desc { font-size: 14px; color: var(--text-sub); margin-bottom: 16px; line-height: 1.6; }
+
+  @media (max-width: 480px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    main { padding: 0 16px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo">산업재산권법 조문연습</a>
+    <div class="nav-links">
+      <a href="study.html">조문 암기</a>
+      <a href="cards.html">커스텀 카드</a>
+      <span class="nav-auth"></span>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <h1 class="page-title">마이페이지</h1>
+  <div id="pageContent">
+    <div class="card">
+      <div class="skeleton" style="height:52px;width:200px;border-radius:10px;"></div>
+    </div>
+  </div>
+</main>
+
+<script type="module">
+  import { auth, myStats, profile as profileAPI, supabase, renderAuthNav } from './supabase-client.js';
+
+  renderAuthNav('.nav-auth');
+
+  const user = await auth.getUser();
+  if (!user) {
+    window.location.href = 'login.html';
+  }
+
+  const [stats, isPremium] = await Promise.all([
+    myStats.get(),
+    profileAPI.isPremium().catch(() => false),
+  ]);
+  const maxLaw = Math.max(stats.byLaw.patent, stats.byLaw.trademark, stats.byLaw.design, 1);
+
+  function pct(n) { return Math.round((n / maxLaw) * 100); }
+  function fmt(d) {
+    const dt = new Date(d);
+    return `${dt.getFullYear()}년 ${dt.getMonth()+1}월 ${dt.getDate()}일 가입`;
+  }
+
+  document.getElementById('pageContent').innerHTML = `
+    <!-- 프로필 -->
+    <div class="card">
+      <div class="card-title">계정 정보</div>
+      <div class="profile-row">
+        <div class="avatar">${escapeHtml(user.email[0].toUpperCase())}</div>
+        <div class="profile-info">
+          <div class="profile-email">${escapeHtml(user.email)}</div>
+          <div class="profile-since">${fmt(user.created_at)}</div>
+        </div>
+        ${isPremium
+          ? `<span style="padding:6px 14px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border-radius:20px;font-size:13px;font-weight:700;letter-spacing:0.02em;">✦ 프리미엄</span>`
+          : `<span style="padding:6px 14px;background:var(--border);color:var(--text-mute);border-radius:20px;font-size:13px;font-weight:600;">무료 플랜</span>`
+        }
+      </div>
+      ${!isPremium ? `
+      <div style="margin-top:20px;padding:16px;background:linear-gradient(135deg,rgba(102,126,234,0.08),rgba(118,75,162,0.08));border:1px solid rgba(102,126,234,0.2);border-radius:12px;">
+        <div style="font-size:14px;font-weight:700;margin-bottom:6px;">🚀 프리미엄으로 업그레이드</div>
+        <div style="font-size:13px;color:var(--text-sub);line-height:1.6;">빈칸 저장 조문 <strong>무제한</strong> · 커스텀 카드 <strong>무제한</strong></div>
+        <div style="font-size:12px;color:var(--text-mute);margin-top:8px;">문의: mingminju@gmail.com</div>
+      </div>` : ''}
+    </div>
+
+    <!-- 학습 통계 -->
+    <div class="card">
+      <div class="card-title">학습 통계</div>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <span class="stat-box-value brand">${stats.totalBlanks}</span>
+          <span class="stat-box-label">총 빈칸 수</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-box-value">${stats.byLaw.patent + stats.byLaw.trademark + stats.byLaw.design}</span>
+          <span class="stat-box-label">빈칸 저장 조문</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-box-value">${stats.customCardsCount}</span>
+          <span class="stat-box-label">커스텀 카드</span>
+        </div>
+      </div>
+      <div class="law-stats">
+        ${[
+          { name: '특허법', key: 'patent' },
+          { name: '상표법', key: 'trademark' },
+          { name: '디자인', key: 'design' },
+          { name: '커스텀', key: 'custom' },
+        ].map(({ name, key }) => `
+          <div class="law-stat-row">
+            <span class="law-stat-name">${name}</span>
+            <div class="law-stat-bar-wrap">
+              <div class="law-stat-bar" style="width:${pct(stats.byLaw[key])}%"></div>
+            </div>
+            <span class="law-stat-count">${stats.byLaw[key]}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <!-- 비밀번호 변경 -->
+    <div class="card">
+      <div class="card-title">비밀번호 변경</div>
+      <div class="alert" id="pwAlert"></div>
+      <div class="form-group">
+        <label class="form-label">새 비밀번호</label>
+        <input class="form-input" type="password" id="newPw" placeholder="6자 이상">
+      </div>
+      <div class="form-group">
+        <label class="form-label">새 비밀번호 확인</label>
+        <input class="form-input" type="password" id="newPwConfirm" placeholder="동일하게 입력">
+      </div>
+      <button class="btn btn-primary" id="pwBtn" onclick="changePw()">비밀번호 변경</button>
+    </div>
+
+    <!-- 로그아웃 / 탈퇴 -->
+    <div class="card danger-zone">
+      <div class="card-title">계정 관리</div>
+      <div class="btn-row">
+        <button class="btn btn-outline" onclick="doLogout()">로그아웃</button>
+        <button class="btn btn-danger" onclick="deleteAccount()">계정 탈퇴</button>
+      </div>
+    </div>
+  `;
+
+  async function changePw() {
+    const pw = document.getElementById('newPw').value;
+    const pw2 = document.getElementById('newPwConfirm').value;
+    const alert = document.getElementById('pwAlert');
+    const btn = document.getElementById('pwBtn');
+
+    if (pw.length < 6) { showAlert(alert, 'error', '비밀번호는 6자 이상이어야 합니다.'); return; }
+    if (pw !== pw2) { showAlert(alert, 'error', '비밀번호가 일치하지 않습니다.'); return; }
+
+    btn.disabled = true; btn.textContent = '변경 중...';
+    const { error } = await supabase.auth.updateUser({ password: pw });
+    btn.disabled = false; btn.textContent = '비밀번호 변경';
+
+    if (error) { showAlert(alert, 'error', '변경 실패: ' + error.message); }
+    else {
+      showAlert(alert, 'success', '비밀번호가 변경되었습니다.');
+      document.getElementById('newPw').value = '';
+      document.getElementById('newPwConfirm').value = '';
+    }
+  }
+
+  async function doLogout() {
+    await auth.signOut();
+    window.location.href = 'index.html';
+  }
+
+  async function deleteAccount() {
+    if (!confirm('정말 탈퇴하시겠습니까?\n모든 학습 데이터(빈칸, 커스텀 카드)가 삭제되며 복구할 수 없습니다.')) return;
+    const input = prompt('탈퇴를 확인하려면 이메일 주소를 입력하세요:');
+    if (input !== user.email) { alert('이메일이 일치하지 않습니다.'); return; }
+
+    const { error } = await supabase.rpc('delete_user');
+    if (error) {
+      alert('탈퇴 처리 중 오류가 발생했습니다. 관리자에게 문의하세요.\n' + error.message);
+    } else {
+      await auth.signOut();
+      window.location.href = 'index.html';
+    }
+  }
+
+  function showAlert(el, type, msg) {
+    el.className = `alert ${type} show`;
+    el.textContent = msg;
+    setTimeout(() => { el.className = 'alert'; }, 4000);
+  }
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  window.changePw = changePw;
+  window.doLogout = doLogout;
+  window.deleteAccount = deleteAccount;
+</script>
+</body>
+</html>

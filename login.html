@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>로그인 | 산업재산권법 조문연습</title>
+<meta name="description" content="로그인하고 빈칸 학습 데이터를 모든 기기에서 동기화하세요.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F9FAFB;
+    --bg-card: #FFFFFF;
+    --text: #191F28;
+    --text-sub: #4E5968;
+    --text-mute: #8B95A1;
+    --border: #F2F4F6;
+    --border-strong: #E5E8EB;
+    --brand: #3182F6;
+    --brand-sub: #E8F3FF;
+    --brand-hover: #1B64DA;
+    --success: #00C471;
+    --success-sub: #E6F9F0;
+    --danger: #F04452;
+    --danger-sub: #FFEBED;
+    --radius: 14px;
+    --radius-lg: 20px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.01em;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Navigation */
+  nav {
+    background: rgba(249, 250, 251, 0.85);
+    backdrop-filter: saturate(180%) blur(12px);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px; max-width: 1080px; margin: 0 auto; padding: 0 24px;
+  }
+  .logo {
+    font-size: 18px; font-weight: 800; color: var(--text);
+    text-decoration: none; letter-spacing: -0.03em;
+  }
+  .nav-links { display: flex; gap: 28px; align-items: center; }
+  .nav-links a {
+    color: var(--text-sub); text-decoration: none; font-size: 15px; font-weight: 500;
+  }
+
+  /* Main */
+  main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+  }
+  .auth-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 48px;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  }
+
+  .auth-header { text-align: center; margin-bottom: 36px; }
+  .auth-title {
+    font-size: 28px; font-weight: 800; letter-spacing: -0.03em;
+    margin-bottom: 8px;
+  }
+  .auth-sub {
+    font-size: 15px; color: var(--text-sub);
+  }
+
+  /* Tab switcher */
+  .tabs {
+    display: flex;
+    background: var(--border);
+    padding: 3px;
+    border-radius: 10px;
+    margin-bottom: 28px;
+  }
+  .tab {
+    flex: 1;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--text-sub);
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .tab.active {
+    background: white;
+    color: var(--text);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Form */
+  .form-group { margin-bottom: 18px; }
+  .form-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-sub);
+    margin-bottom: 8px;
+  }
+  .form-input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid var(--border-strong);
+    border-radius: 12px;
+    font-size: 15px;
+    font-family: inherit;
+    background: var(--bg-card);
+    color: var(--text);
+    transition: all 0.15s;
+    letter-spacing: -0.01em;
+  }
+  .form-input:focus {
+    outline: none;
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px rgba(49, 130, 246, 0.1);
+  }
+  .form-input::placeholder {
+    color: var(--text-mute);
+  }
+  .form-input.error {
+    border-color: var(--danger);
+    background: var(--danger-sub);
+  }
+  .form-hint {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--text-mute);
+  }
+
+  /* Submit button */
+  .submit-btn {
+    width: 100%;
+    padding: 15px;
+    background: var(--brand);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+    margin-top: 8px;
+    letter-spacing: -0.01em;
+  }
+  .submit-btn:hover:not(:disabled) { background: var(--brand-hover); }
+  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .forgot-link {
+    display: block;
+    text-align: center;
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--text-sub);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .forgot-link:hover { color: var(--text); text-decoration: underline; }
+
+  /* Alert boxes */
+  .alert {
+    padding: 14px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.5;
+  }
+  .alert-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .alert.success {
+    background: var(--success-sub);
+    color: #006B3C;
+    border: 1px solid rgba(0, 196, 113, 0.2);
+  }
+  .alert.error {
+    background: var(--danger-sub);
+    color: #B01826;
+    border: 1px solid rgba(240, 68, 82, 0.15);
+  }
+  .alert.info {
+    background: var(--brand-sub);
+    color: #0F4C9E;
+    border: 1px solid rgba(49, 130, 246, 0.15);
+  }
+
+  /* Loading spinner */
+  .spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Footer */
+  footer {
+    padding: 24px;
+    text-align: center;
+    color: var(--text-mute);
+    font-size: 13px;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 480px) {
+    .auth-card { padding: 32px 24px; }
+    .auth-title { font-size: 24px; }
+  }
+
+  /* Password strength bar */
+  .pw-strength {
+    display: flex;
+    gap: 4px;
+    margin-top: 8px;
+    height: 3px;
+  }
+  .pw-strength-bar {
+    flex: 1;
+    background: var(--border-strong);
+    border-radius: 2px;
+    transition: background 0.2s;
+  }
+  .pw-strength-bar.active-1 { background: var(--danger); }
+  .pw-strength-bar.active-2 { background: #F4A100; }
+  .pw-strength-bar.active-3 { background: var(--success); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo">산업재산권법 조문연습</a>
+    <div class="nav-links">
+      <a href="index.html">홈</a>
+      <a href="study.html">조문 학습</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <div class="auth-card">
+    <div class="auth-header">
+      <h1 class="auth-title" id="authTitle">로그인</h1>
+      <p class="auth-sub" id="authSub">학습 데이터를 모든 기기에서 동기화하세요</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-mode="signin">로그인</button>
+      <button class="tab" data-mode="signup">회원가입</button>
+    </div>
+
+    <div id="alertBox"></div>
+
+    <form id="authForm" novalidate>
+      <div class="form-group">
+        <label class="form-label" for="email">이메일</label>
+        <input type="email" id="email" class="form-input" placeholder="you@example.com" autocomplete="email" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">비밀번호</label>
+        <input type="password" id="password" class="form-input" placeholder="6자 이상 입력" autocomplete="current-password" required>
+        <div class="pw-strength" id="pwStrength" style="display:none;">
+          <div class="pw-strength-bar"></div>
+          <div class="pw-strength-bar"></div>
+          <div class="pw-strength-bar"></div>
+        </div>
+        <div class="form-hint" id="pwHint"></div>
+      </div>
+
+      <div class="form-group" id="passwordConfirmGroup" style="display:none;">
+        <label class="form-label" for="passwordConfirm">비밀번호 확인</label>
+        <input type="password" id="passwordConfirm" class="form-input" placeholder="비밀번호 다시 입력" autocomplete="new-password">
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">로그인</button>
+
+      <a href="#" class="forgot-link" id="forgotLink">비밀번호를 잊으셨나요?</a>
+    </form>
+  </div>
+</main>
+
+<footer>
+  &copy; 2026 산업재산권법 조문연습 &middot; 문의: mingminju@gmail.com
+</footer>
+
+<script type="module">
+  import { auth, blanks } from './supabase-client.js';
+
+  // 이미 로그인 되어 있다면 홈으로
+  const existing = await auth.getUser();
+  if (existing) {
+    const params = new URLSearchParams(location.search);
+    if (!params.has('verified') && !params.has('reset')) {
+      window.location.href = 'study.html';
+    }
+  }
+
+  // URL 파라미터로 상태 안내
+  const params = new URLSearchParams(location.search);
+  if (params.has('verified')) {
+    showAlert('success', '이메일 인증이 완료되었습니다. 이제 로그인해주세요.');
+  }
+  if (params.has('reset')) {
+    showAlert('info', '비밀번호 재설정 메일이 발송되었습니다. 메일함을 확인해주세요.');
+  }
+
+  // === DOM 참조 ===
+  const form = document.getElementById('authForm');
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
+  const pwConfirmGroup = document.getElementById('passwordConfirmGroup');
+  const pwConfirmInput = document.getElementById('passwordConfirm');
+  const submitBtn = document.getElementById('submitBtn');
+  const title = document.getElementById('authTitle');
+  const sub = document.getElementById('authSub');
+  const forgotLink = document.getElementById('forgotLink');
+  const pwStrength = document.getElementById('pwStrength');
+  const pwHint = document.getElementById('pwHint');
+
+  let mode = 'signin'; // 'signin' | 'signup'
+
+  // === 탭 전환 ===
+  document.querySelectorAll('.tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      mode = btn.dataset.mode;
+      updateModeUI();
+      clearAlert();
+    });
+  });
+
+  function updateModeUI() {
+    if (mode === 'signin') {
+      title.textContent = '로그인';
+      sub.textContent = '학습 데이터를 모든 기기에서 동기화하세요';
+      submitBtn.textContent = '로그인';
+      pwConfirmGroup.style.display = 'none';
+      pwStrength.style.display = 'none';
+      pwHint.textContent = '';
+      passwordInput.setAttribute('autocomplete', 'current-password');
+      forgotLink.style.display = 'block';
+    } else {
+      title.textContent = '회원가입';
+      sub.textContent = '무료로 가입하고 바로 시작하세요';
+      submitBtn.textContent = '가입하기';
+      pwConfirmGroup.style.display = 'block';
+      pwStrength.style.display = 'flex';
+      passwordInput.setAttribute('autocomplete', 'new-password');
+      forgotLink.style.display = 'none';
+    }
+  }
+
+  // === 비밀번호 강도 체크 ===
+  passwordInput.addEventListener('input', () => {
+    if (mode !== 'signup') return;
+    const pw = passwordInput.value;
+    const { level, text } = computeStrength(pw);
+    const bars = pwStrength.querySelectorAll('.pw-strength-bar');
+    bars.forEach((bar, i) => {
+      bar.className = 'pw-strength-bar';
+      if (i < level) bar.classList.add(`active-${level}`);
+    });
+    pwHint.textContent = text;
+  });
+
+  function computeStrength(pw) {
+    if (pw.length === 0) return { level: 0, text: '' };
+    if (pw.length < 6) return { level: 1, text: '너무 짧습니다 (6자 이상)' };
+    let score = 0;
+    if (pw.length >= 8) score++;
+    if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
+    if (/[0-9]/.test(pw)) score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+    if (score >= 3) return { level: 3, text: '안전한 비밀번호입니다' };
+    if (score >= 2) return { level: 2, text: '보통 — 특수문자 추가 권장' };
+    return { level: 1, text: '약함 — 숫자나 특수문자를 포함하세요' };
+  }
+
+  // === 폼 제출 ===
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearAlert();
+
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+
+    // 클라이언트 검증
+    if (!isValidEmail(email)) {
+      showAlert('error', '올바른 이메일 형식이 아닙니다.');
+      emailInput.classList.add('error');
+      return;
+    }
+    emailInput.classList.remove('error');
+
+    if (password.length < 6) {
+      showAlert('error', '비밀번호는 6자 이상이어야 합니다.');
+      passwordInput.classList.add('error');
+      return;
+    }
+    passwordInput.classList.remove('error');
+
+    if (mode === 'signup') {
+      if (password !== pwConfirmInput.value) {
+        showAlert('error', '비밀번호가 일치하지 않습니다.');
+        pwConfirmInput.classList.add('error');
+        return;
+      }
+      pwConfirmInput.classList.remove('error');
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<span class="spinner"></span>처리 중...`;
+
+    try {
+      if (mode === 'signin') {
+        const { data, error } = await auth.signIn(email, password);
+        if (error) {
+          showAlert('error', mapError(error.message));
+          return;
+        }
+        // 로그인 성공 → localStorage 빈칸 → DB 이관
+        showAlert('success', '로그인 성공! 데이터를 동기화하는 중...');
+        await blanks.migrateLocalToCloud();
+        setTimeout(() => { window.location.href = 'study.html'; }, 600);
+      } else {
+        const { data, error } = await auth.signUp(email, password);
+        if (error) {
+          showAlert('error', mapError(error.message));
+          return;
+        }
+        // 이메일 인증 필요한 경우
+        if (data.user && !data.session) {
+          showAlert('success', `${email}로 인증 메일을 보냈습니다. 메일 속 링크를 클릭해 인증을 완료해주세요.`);
+          form.reset();
+          pwStrength.querySelectorAll('.pw-strength-bar').forEach(b => b.className = 'pw-strength-bar');
+          pwHint.textContent = '';
+        } else {
+          // 즉시 로그인된 경우 (Supabase에서 이메일 인증 disabled 상태일 때)
+          showAlert('success', '가입 완료! 조문 학습 페이지로 이동합니다...');
+          await blanks.migrateLocalToCloud();
+          setTimeout(() => { window.location.href = 'study.html'; }, 800);
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      showAlert('error', '네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = mode === 'signin' ? '로그인' : '가입하기';
+    }
+  });
+
+  // === 비밀번호 찾기 ===
+  forgotLink.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const email = emailInput.value.trim();
+    if (!isValidEmail(email)) {
+      showAlert('error', '비밀번호 재설정을 위해 이메일을 먼저 입력해주세요.');
+      emailInput.focus();
+      return;
+    }
+    const { error } = await auth.resetPassword(email);
+    if (error) {
+      showAlert('error', mapError(error.message));
+    } else {
+      showAlert('success', `${email}로 비밀번호 재설정 메일을 발송했습니다.`);
+    }
+  });
+
+  // === 유틸 ===
+  function isValidEmail(e) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+  }
+
+  function showAlert(type, message) {
+    const icons = {
+      success: '<svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>',
+      error: '<svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+      info: '<svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
+    };
+    document.getElementById('alertBox').innerHTML = `
+      <div class="alert ${type}">
+        ${icons[type] || ''}
+        <span>${escapeHtml(message)}</span>
+      </div>
+    `;
+  }
+
+  function clearAlert() {
+    document.getElementById('alertBox').innerHTML = '';
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  // Supabase 에러 메시지를 한국어로 매핑
+  function mapError(msg) {
+    const m = msg.toLowerCase();
+    if (m.includes('invalid login credentials')) return '이메일 또는 비밀번호가 일치하지 않습니다.';
+    if (m.includes('email not confirmed')) return '이메일 인증이 완료되지 않았습니다. 메일함을 확인해주세요.';
+    if (m.includes('user already registered')) return '이미 가입된 이메일입니다. 로그인 탭을 이용해주세요.';
+    if (m.includes('password should be at least')) return '비밀번호는 6자 이상이어야 합니다.';
+    if (m.includes('unable to validate email')) return '올바른 이메일 형식이 아닙니다.';
+    if (m.includes('rate limit') || m.includes('too many')) return '요청이 너무 많습니다. 잠시 후 다시 시도해주세요.';
+    if (m.includes('yoursupa') || m.includes('invalid api key') || m.includes('failed to fetch')) {
+      return 'Supabase 설정이 아직 완료되지 않았습니다.';
+    }
+    return msg;
+  }
+</script>
+
+</body>
+</html>

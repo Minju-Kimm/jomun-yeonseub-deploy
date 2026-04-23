@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>조문연습 | 특허법·상표법·디자인보호법 조문 빈칸으로 암기</title>
+<meta name="description" content="특허법, 상표법, 디자인보호법 전 조문을 빈칸 채우기로 암기하세요. 변리사, 변호사시험 수험생을 위한 조문 암기 사이트.">
+<meta name="keywords" content="특허법 조문, 상표법 조문, 디자인보호법 조문, 변리사 조문 암기, 변호사시험 조문, 조문 빈칸">
+<meta property="og:title" content="조문연습 — 특허법·상표법·디자인보호법 조문 암기">
+<meta property="og:description" content="빈칸 채우기로 조문 완벽 암기">
+<meta property="og:type" content="website">
+<meta name="google-site-verification" content="k0zZ1NmcZeL9A-htcqJQhhuit3b7mDthK7c9rMCSMgk" />
+<meta name="naver-site-verification" content="4904a1f85d5b909f6c89526999507ca1226274e9" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F9FAFB;
+    --bg-card: #FFFFFF;
+    --text: #191F28;
+    --text-sub: #4E5968;
+    --text-mute: #8B95A1;
+    --border: #F2F4F6;
+    --border-strong: #E5E8EB;
+    --brand: #3182F6;
+    --brand-sub: #E8F3FF;
+    --accent: #FFF3CD;
+    --success: #00C471;
+    --radius: 14px;
+    --radius-lg: 20px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.01em;
+  }
+  .container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+  /* Navigation */
+  nav {
+    position: sticky; top: 0; background: rgba(249, 250, 251, 0.85);
+    backdrop-filter: saturate(180%) blur(12px);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    z-index: 100; border-bottom: 1px solid var(--border);
+  }
+  .nav-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px; max-width: 1080px; margin: 0 auto; padding: 0 24px;
+  }
+  .logo {
+    font-size: 18px; font-weight: 800; color: var(--text);
+    text-decoration: none; letter-spacing: -0.03em;
+  }
+  .nav-links { display: flex; gap: 28px; align-items: center; }
+  .nav-links a {
+    color: var(--text-sub); text-decoration: none; font-size: 15px; font-weight: 500;
+    transition: color 0.15s;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta {
+    background: var(--text); color: white !important; padding: 8px 16px;
+    border-radius: 10px; font-weight: 600 !important;
+  }
+  .nav-cta:hover { background: #000; }
+
+  /* Hero */
+  .hero { padding: 120px 0 100px; }
+  .badge {
+    display: inline-block; padding: 6px 14px; background: var(--brand-sub);
+    color: var(--brand); font-size: 13px; font-weight: 600; border-radius: 100px;
+    margin-bottom: 24px;
+  }
+  h1 {
+    font-size: 64px; font-weight: 800; line-height: 1.15;
+    letter-spacing: -0.04em; margin-bottom: 24px;
+  }
+  h1 .highlight { color: var(--brand); }
+
+  /* 법령명 로테이터 */
+  .law-rotator {
+    display: inline-block;
+    transition: opacity 0.45s ease, transform 0.45s ease;
+    will-change: opacity, transform;
+    min-width: 1ch;
+  }
+  .law-rotator.swap-out {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  .law-rotator.swap-in-prep {
+    opacity: 0;
+    transform: translateY(12px);
+    transition: none;
+  }
+  .hero-sub {
+    font-size: 20px; color: var(--text-sub); margin-bottom: 40px;
+    max-width: 600px; font-weight: 400;
+  }
+  .cta-group { display: flex; gap: 12px; align-items: center; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 16px 28px; border-radius: 12px; font-size: 16px; font-weight: 600;
+    text-decoration: none; transition: all 0.15s; border: none; cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-primary { background: var(--brand); color: white; }
+  .btn-primary:hover { background: #1B64DA; transform: translateY(-1px); }
+  .btn-secondary { background: var(--bg-card); color: var(--text); border: 1px solid var(--border-strong); }
+  .btn-secondary:hover { border-color: var(--text-mute); }
+  .btn-arrow { transition: transform 0.15s; }
+  .btn:hover .btn-arrow { transform: translateX(3px); }
+
+  /* Hero Visual */
+  .hero-visual {
+    margin-top: 80px; background: var(--bg-card); border-radius: var(--radius-lg);
+    padding: 32px; border: 1px solid var(--border);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  }
+  .demo-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-bottom: 20px; border-bottom: 1px solid var(--border); margin-bottom: 24px;
+  }
+  .demo-title { font-size: 14px; color: var(--text-mute); font-weight: 500; }
+  .demo-progress { display: flex; gap: 4px; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border-strong); }
+  .dot.active { background: var(--brand); }
+  .article-title {
+    font-size: 14px; color: var(--brand); font-weight: 600; margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
+  .article-name { font-size: 24px; font-weight: 700; margin-bottom: 20px; }
+  .article-body {
+    font-family: 'Gowun Batang', serif; font-size: 19px; line-height: 2; color: var(--text);
+  }
+  .blank {
+    display: inline-block; min-width: 90px; height: 32px;
+    border-bottom: 2px solid var(--brand); margin: 0 4px;
+    vertical-align: middle; position: relative;
+  }
+  .blank.filled {
+    background: var(--accent); border-bottom: 2px solid #F4A100;
+    padding: 2px 10px; border-radius: 6px 6px 0 0;
+    font-family: 'Pretendard', sans-serif; font-weight: 600;
+    font-size: 17px; height: auto; min-width: auto;
+  }
+
+  /* Sections */
+  section { padding: 100px 0; }
+  .section-label {
+    font-size: 14px; color: var(--brand); font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px;
+  }
+  h2 {
+    font-size: 44px; font-weight: 800; line-height: 1.2;
+    letter-spacing: -0.03em; margin-bottom: 16px;
+  }
+  .section-sub {
+    font-size: 18px; color: var(--text-sub); margin-bottom: 60px; max-width: 540px;
+  }
+
+  /* Features Grid */
+  .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .feature-card {
+    background: var(--bg-card); padding: 32px; border-radius: var(--radius-lg);
+    border: 1px solid var(--border); transition: all 0.2s;
+  }
+  .feature-card:hover { border-color: var(--brand); transform: translateY(-2px); }
+  .feature-icon {
+    width: 48px; height: 48px; border-radius: 12px; background: var(--brand-sub);
+    display: flex; align-items: center; justify-content: center; margin-bottom: 20px;
+    color: var(--brand);
+  }
+  .feature-title {
+    font-size: 20px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.02em;
+  }
+  .feature-desc { color: var(--text-sub); font-size: 15px; line-height: 1.7; }
+
+  /* Article Chips (Popular Articles Section) */
+  .article-chips { display: flex; flex-direction: column; gap: 28px; }
+  .chip-group-title {
+    font-size: 14px; font-weight: 700; color: var(--text-mute);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px;
+  }
+  .chip-list {
+    display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 16px; background: var(--bg); border: 1px solid var(--border-strong);
+    border-radius: 100px; text-decoration: none; color: var(--text);
+    font-size: 14px; font-weight: 600; transition: all 0.15s;
+    letter-spacing: -0.01em;
+  }
+  .chip:hover {
+    background: var(--brand-sub); border-color: var(--brand); color: var(--brand);
+    transform: translateY(-1px);
+  }
+  .chip-sub {
+    font-size: 12px; color: var(--text-mute); font-weight: 500;
+  }
+  .chip:hover .chip-sub { color: var(--brand); opacity: 0.7; }
+
+  /* How it works */
+  .how-section { background: var(--bg-card); }
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-top: 60px; }
+  .step { position: relative; }
+  .step-number {
+    font-size: 52px; font-weight: 800; color: var(--border-strong);
+    line-height: 1; margin-bottom: 20px; letter-spacing: -0.04em;
+  }
+  .step-title {
+    font-size: 22px; font-weight: 700; margin-bottom: 12px; letter-spacing: -0.02em;
+  }
+  .step-desc { color: var(--text-sub); font-size: 15px; line-height: 1.7; }
+
+  /* Pricing */
+  .pricing { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 760px; margin: 60px auto 0; }
+  .price-card {
+    background: var(--bg-card); padding: 40px; border-radius: var(--radius-lg);
+    border: 1px solid var(--border); position: relative;
+  }
+  .price-card.featured {
+    border: 2px solid var(--brand);
+    box-shadow: 0 4px 24px rgba(49, 130, 246, 0.08);
+  }
+  .price-tag {
+    position: absolute; top: -12px; right: 24px; background: var(--brand);
+    color: white; padding: 6px 14px; border-radius: 100px; font-size: 12px; font-weight: 700;
+  }
+  .plan-name {
+    font-size: 15px; font-weight: 600; color: var(--text-sub); margin-bottom: 8px;
+  }
+  .plan-price {
+    font-size: 40px; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 4px;
+  }
+  .plan-price .currency { font-size: 24px; }
+  .plan-price .period { font-size: 15px; color: var(--text-mute); font-weight: 500; }
+  .plan-desc { color: var(--text-sub); font-size: 14px; margin-bottom: 28px; min-height: 40px; }
+  .plan-features { list-style: none; margin-bottom: 28px; }
+  .plan-features li {
+    padding: 10px 0; font-size: 15px; color: var(--text); display: flex; align-items: center; gap: 10px;
+  }
+  .check {
+    width: 18px; height: 18px; border-radius: 50%; background: var(--brand-sub);
+    display: flex; align-items: center; justify-content: center; color: var(--brand); flex-shrink: 0;
+  }
+  .check.muted { background: var(--border); color: var(--text-mute); }
+
+  /* Payment Guide */
+  .payment-section { background: var(--bg); }
+  .payment-box {
+    max-width: 640px; margin: 60px auto 0; background: var(--bg-card);
+    border-radius: var(--radius-lg); padding: 40px; border: 1px solid var(--border);
+  }
+  .payment-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 0; border-bottom: 1px solid var(--border);
+  }
+  .payment-row:last-child { border-bottom: none; }
+  .payment-label { font-size: 14px; color: var(--text-sub); font-weight: 500; }
+  .payment-value {
+    font-size: 16px; font-weight: 600; font-family: 'SF Mono', Menlo, Consolas, monospace;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .copy-btn {
+    background: var(--brand-sub); color: var(--brand); border: none;
+    padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+  }
+  .copy-btn:hover { background: #DCE9FB; }
+  .payment-note {
+    margin-top: 24px; padding: 16px; background: #FFF8E6;
+    border-radius: 10px; font-size: 14px; color: #8A6D00; line-height: 1.6;
+  }
+  .payment-note strong { color: #6F5700; }
+
+  /* FAQ */
+  .faq { max-width: 720px; margin: 60px auto 0; }
+  .faq-item {
+    border-bottom: 1px solid var(--border); padding: 24px 0; cursor: pointer;
+  }
+  .faq-q {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 17px; font-weight: 600; letter-spacing: -0.01em;
+  }
+  .faq-a {
+    max-height: 0; overflow: hidden; transition: max-height 0.3s, margin 0.3s;
+    color: var(--text-sub); line-height: 1.7;
+  }
+  .faq-item.open .faq-a { max-height: 200px; margin-top: 12px; }
+  .faq-item.open .faq-toggle { transform: rotate(45deg); }
+  .faq-toggle {
+    font-size: 20px; color: var(--text-mute); transition: transform 0.2s;
+    font-weight: 300;
+  }
+
+  /* Footer */
+  footer {
+    padding: 48px 0; border-top: 1px solid var(--border); color: var(--text-mute);
+    font-size: 13px; line-height: 1.8;
+  }
+  .footer-top { display: flex; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 20px; }
+  .footer-brand { color: var(--text); font-weight: 700; font-size: 16px; }
+
+  /* Animations */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .hero > * { animation: fadeUp 0.6s ease forwards; opacity: 0; }
+  .hero .badge { animation-delay: 0.05s; }
+  .hero h1 { animation-delay: 0.15s; }
+  .hero .hero-sub { animation-delay: 0.25s; }
+  .hero .cta-group { animation-delay: 0.35s; }
+  .hero .hero-visual { animation-delay: 0.45s; }
+
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .blank::after {
+    content: ''; position: absolute; right: 4px; bottom: -2px;
+    width: 2px; height: 20px; background: var(--brand); animation: blink 1s infinite;
+  }
+  .blank.filled::after { display: none; }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    h1 { font-size: 40px; }
+    h2 { font-size: 32px; }
+    .hero { padding: 60px 0 60px; }
+    .hero-sub { font-size: 17px; }
+    section { padding: 60px 0; }
+    .features, .steps, .pricing { grid-template-columns: 1fr; }
+    .nav-links a:not(.nav-cta) { display: none; }
+    .article-body { font-size: 16px; }
+    .cta-group { flex-direction: column; align-items: stretch; }
+    .btn { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="logo">
+      산업재산권법 조문연습
+    </a>
+    <div class="nav-links">
+      <a href="#features">기능</a>
+      <a href="#pricing">가격</a>
+      <a href="#payment">결제방법</a>
+      <span class="nav-auth"><a href="login.html" class="nav-cta">로그인</a></span>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="container">
+    <span class="badge">변리사 · 변호사시험 수험생을 위한</span>
+    <h1><span class="law-rotator" id="lawRotator">특허법</span> 조문,<br><span class="highlight">빈칸으로</span> 암기하세요.</h1>
+    <p class="hero-sub">
+      매일 조문 하나씩, 빈칸 채우기로 완벽하게.<br>
+      눈으로만 읽는 암기는 이제 그만.
+    </p>
+    <div class="cta-group">
+      <a href="study.html" class="btn btn-primary">
+        무료로 시작하기
+        <span class="btn-arrow">→</span>
+      </a>
+      <a href="#features" class="btn btn-secondary">어떻게 작동하나요?</a>
+    </div>
+
+    <div class="hero-visual">
+      <div class="demo-header">
+        <div class="demo-title">특허법 · 제2장 특허요건 및 특허출원</div>
+        <div class="demo-progress">
+          <div class="dot active"></div><div class="dot active"></div>
+          <div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+      </div>
+      <div class="article-title">제29조</div>
+      <div class="article-name">특허요건</div>
+      <div class="article-body">
+        ① <span class="blank filled">산업상</span> 이용할 수 있는 발명으로서 다음 각 호의 어느 하나에 해당하는 것을 제외하고는 그 발명에 대하여 <span class="blank filled">특허</span>를 받을 수 있다.<br>
+        1. 특허출원 전에 <span class="blank filled">국내 또는 국외</span>에서 공연히 <span class="blank"></span>된 발명<br>
+        2. 특허출원 전에 국내 또는 국외에서 반포된 <span class="blank"></span>에 게재되었거나 전기통신회선을 통하여 공중이 이용할 수 있는 발명
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="container">
+    <div class="section-label">Features</div>
+    <h2>조문 암기, 제대로 한 번만.</h2>
+    <p class="section-sub">
+      기출에서 조문 그대로 나오는 법과목. 빈칸 채우기가 가장 효율적입니다.
+    </p>
+
+    <div class="features">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <div class="feature-title">전체 조문 수록</div>
+        <p class="feature-desc">특허법 전 조문, 상표법 전 조문. 기출 빈출도 순으로 자동 정렬되어 중요한 것부터 공부할 수 있습니다.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11H5a2 2 0 00-2 2v7a2 2 0 002 2h14a2 2 0 002-2v-7a2 2 0 00-2-2h-4"/><polyline points="12 3 12 15"/><polyline points="9 6 12 3 15 6"/></svg>
+        </div>
+        <div class="feature-title">스마트 빈칸 시스템</div>
+        <p class="feature-desc">조문의 핵심 요건, 숫자, 기간만 빈칸으로. 부사·조사는 그대로 두어 문맥 파악이 쉽습니다.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="feature-title">진도 자동 저장</div>
+        <p class="feature-desc">어디까지 외웠는지, 어떤 조문이 헷갈리는지 자동 기록. 오답 조문만 모아서 다시 풀 수 있습니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="popular-articles" style="background: var(--bg-card);">
+  <div class="container">
+    <div class="section-label">Quick access</div>
+    <h2>자주 찾는 조문 바로가기</h2>
+    <p class="section-sub">수험생들이 가장 많이 공부하는 핵심 조문들입니다.</p>
+
+    <div class="article-chips">
+      <div class="chip-group">
+        <div class="chip-group-title">특허법</div>
+        <div class="chip-list">
+          <a href="patent/29.html" class="chip">제29조 <span class="chip-sub">특허요건</span></a>
+          <a href="patent/30.html" class="chip">제30조 <span class="chip-sub">공지예외</span></a>
+          <a href="patent/33.html" class="chip">제33조 <span class="chip-sub">특허받을권리</span></a>
+          <a href="patent/42.html" class="chip">제42조 <span class="chip-sub">출원서류</span></a>
+          <a href="patent/47.html" class="chip">제47조 <span class="chip-sub">보정</span></a>
+          <a href="patent/62.html" class="chip">제62조 <span class="chip-sub">거절이유</span></a>
+          <a href="patent/94.html" class="chip">제94조 <span class="chip-sub">특허권의 효력</span></a>
+          <a href="patent/132.html" class="chip">제132조 <span class="chip-sub">특허취소</span></a>
+        </div>
+      </div>
+
+      <div class="chip-group">
+        <div class="chip-group-title">상표법</div>
+        <div class="chip-list">
+          <a href="trademark/33.html" class="chip">제33조 <span class="chip-sub">상표등록요건</span></a>
+          <a href="trademark/34.html" class="chip">제34조 <span class="chip-sub">등록받을수없는상표</span></a>
+          <a href="trademark/35.html" class="chip">제35조 <span class="chip-sub">선출원</span></a>
+          <a href="trademark/89.html" class="chip">제89조 <span class="chip-sub">상표권효력</span></a>
+          <a href="trademark/108.html" class="chip">제108조 <span class="chip-sub">침해보는행위</span></a>
+          <a href="trademark/119.html" class="chip">제119조 <span class="chip-sub">상표등록취소</span></a>
+        </div>
+      </div>
+
+      <div class="chip-group">
+        <div class="chip-group-title">디자인보호법</div>
+        <div class="chip-list">
+          <a href="design/33.html" class="chip">제33조 <span class="chip-sub">디자인등록요건</span></a>
+          <a href="design/34.html" class="chip">제34조 <span class="chip-sub">등록받을수없는디자인</span></a>
+          <a href="design/35.html" class="chip">제35조 <span class="chip-sub">관련디자인</span></a>
+          <a href="design/92.html" class="chip">제92조 <span class="chip-sub">디자인권의효력</span></a>
+          <a href="design/121.html" class="chip">제121조 <span class="chip-sub">무효심판</span></a>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 32px;">
+      <a href="study.html" class="btn btn-secondary">전체 조문 목록 보기</a>
+    </div>
+  </div>
+</section>
+
+<section id="how" class="how-section">
+  <div class="container">
+    <div class="section-label">How it works</div>
+    <h2>3단계면 충분합니다.</h2>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">01</div>
+        <div class="step-title">조문 선택</div>
+        <p class="step-desc">특허법, 상표법 중 오늘 외울 조문을 선택합니다. 빈출 순서로 자동 추천됩니다.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">02</div>
+        <div class="step-title">빈칸 채우기</div>
+        <p class="step-desc">요건·숫자·기간이 빈칸으로 제시됩니다. 직접 입력하거나 보기에서 고르세요.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">03</div>
+        <div class="step-title">반복 학습</div>
+        <p class="step-desc">틀린 조문은 오답 노트에 자동 저장. 다음 날 다시 풀게 됩니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="pricing">
+  <div class="container">
+    <div class="section-label">Pricing</div>
+    <h2>커피 한 잔 값으로 한 달 내내.</h2>
+    <p class="section-sub">월 4,990원. 부담 없이 시작하고 언제든 해지하세요.</p>
+
+    <div class="pricing">
+      <div class="price-card">
+        <div class="plan-name">무료</div>
+        <div class="plan-price">₩0</div>
+        <p class="plan-desc">조문 암기를 체험해 보세요.</p>
+        <ul class="plan-features">
+          <li><span class="check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>특허법 1~30조 무료 이용</li>
+          <li><span class="check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>진도 자동 저장</li>
+          <li><span class="check muted"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>전체 조문 잠금</li>
+          <li><span class="check muted"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>오답 노트 제한</li>
+        </ul>
+        <a href="study.html" class="btn btn-secondary" style="width: 100%;">무료로 시작</a>
+      </div>
+
+      <div class="price-card featured">
+        <div class="price-tag">인기</div>
+        <div class="plan-name">프리미엄</div>
+        <div class="plan-price">
+          <span class="currency">₩</span>4,990<span class="period"> / 월</span>
+        </div>
+        <p class="plan-desc">시험 끝날 때까지 부담 없이.</p>
+        <ul class="plan-features">
+          <li><span class="check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>특허법 · 상표법 · 디자인보호법 전 조문</li>
+          <li><span class="check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>무제한 빈칸 · 기기 간 동기화</li>
+          <li><span class="check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>오답 조문 자동 복습</li>
+          <li><span class="check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>언제든 해지 가능</li>
+        </ul>
+        <a href="#payment" class="btn btn-primary" style="width: 100%;">프리미엄 시작하기</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="payment" class="payment-section">
+  <div class="container">
+    <div class="section-label">Payment</div>
+    <h2>간단한 계좌 이체로 결제.</h2>
+    <p class="section-sub">PG 수수료 없이 그대로 서비스 품질에 투자합니다.</p>
+
+    <div class="payment-box">
+      <div class="payment-row">
+        <span class="payment-label">입금 계좌</span>
+        <span class="payment-value">
+          우리은행 1002853348168
+          <button class="copy-btn" onclick="copyToClipboard('1002853348168', this)">복사</button>
+        </span>
+      </div>
+      <div class="payment-row">
+        <span class="payment-label">예금주</span>
+        <span class="payment-value">진하연</span>
+      </div>
+      <div class="payment-row">
+        <span class="payment-label">결제 금액</span>
+        <span class="payment-value" style="color: var(--brand);">4,990원 / 월</span>
+      </div>
+      <div class="payment-row">
+        <span class="payment-label">입금자명</span>
+        <span class="payment-value">본인이름 + 가입이메일앞4자</span>
+      </div>
+
+      <div class="payment-note">
+        <strong>결제 진행 방법</strong><br>
+        1. 위 계좌로 <strong>4,990원</strong> 입금 (매월)<br>
+        2. 입금자명은 <strong>"홍길동abcd"</strong> 형식으로 (이름 + 이메일 앞 4자)<br>
+        3. 입금 확인 후 <strong>24시간 이내</strong> 프리미엄 자동 활성화<br>
+        4. 문의는 mingminju@gmail.com
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-label">FAQ</div>
+    <h2>자주 묻는 질문</h2>
+
+    <div class="faq">
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">해지는 어떻게 하나요? <span class="faq-toggle">+</span></div>
+        <div class="faq-a">자동 이체가 아닌 수동 입금 방식이므로, 다음 달에 입금하지 않으시면 자동으로 해지됩니다. 별도의 해지 신청이 필요 없습니다.</div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">조문은 언제 업데이트되나요? <span class="faq-toggle">+</span></div>
+        <div class="faq-a">법 개정이 있을 때마다 2주 이내 반영됩니다. 최근 개정 이력은 사이트 내 '업데이트' 메뉴에서 확인하실 수 있습니다.</div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">모바일에서도 사용 가능한가요? <span class="faq-toggle">+</span></div>
+        <div class="faq-a">네, 모든 기능이 모바일 브라우저에서 동일하게 작동합니다. 별도 앱 설치 없이 바로 사용하세요.</div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">변호사시험에도 도움이 되나요? <span class="faq-toggle">+</span></div>
+        <div class="faq-a">특허법·상표법·디자인보호법은 변호사시험 선택과목 '지적재산권법'에 그대로 출제됩니다. 동일한 조문 암기가 필요하므로 공통으로 활용 가능합니다.</div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">왜 계좌이체만 되나요? <span class="faq-toggle">+</span></div>
+        <div class="faq-a">PG사 수수료를 절약해 가격을 낮추기 위함입니다. 월 4,990원이라는 가격이 이 덕분에 가능합니다.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-top">
+      <div>
+        <div class="footer-brand">조문연습</div>
+        <div>특허법·상표법·디자인보호법 조문 암기의 가장 빠른 길</div>
+      </div>
+      <div style="text-align: right;">
+        <div>상호: 조문연습 &middot; 대표: 진하연</div>
+        <div>문의: mingminju@gmail.com</div>
+      </div>
+    </div>
+    <div>&copy; 2026 조문연습. All rights reserved.</div>
+  </div>
+</footer>
+
+<script type="module">
+  import { renderAuthNav } from './supabase-client.js';
+  renderAuthNav();
+</script>
+
+<script>
+  // 법령명 60초마다 로테이션 (특허법 → 상표법 → 디자인보호법)
+  (function rotateLaw() {
+    const laws = ['특허법', '상표법', '디자인보호법'];
+    const el = document.getElementById('lawRotator');
+    let idx = 0;
+    setInterval(() => {
+      el.classList.add('swap-out');
+      setTimeout(() => {
+        idx = (idx + 1) % laws.length;
+        el.textContent = laws[idx];
+        el.classList.remove('swap-out');
+        el.classList.add('swap-in-prep');
+        requestAnimationFrame(() => {
+          el.classList.remove('swap-in-prep');
+        });
+      }, 250);
+    }, 5000);
+  })();
+
+  function copyToClipboard(text, btn) {
+    navigator.clipboard.writeText(text).then(() => {
+      const original = btn.textContent;
+      btn.textContent = '복사됨';
+      btn.style.background = '#00C471';
+      btn.style.color = 'white';
+      setTimeout(() => {
+        btn.textContent = original;
+        btn.style.background = '';
+        btn.style.color = '';
+      }, 1500);
+    });
+  }
+
+  // 히어로 빈칸 애니메이션
+  setTimeout(() => {
+    const blanks = document.querySelectorAll('.hero-visual .blank:not(.filled)');
+    const answers = ['실시', '간행물'];
+    blanks.forEach((b, i) => {
+      setTimeout(() => {
+        b.classList.add('filled');
+        b.textContent = answers[i];
+      }, 1200 + i * 800);
+    });
+  }, 800);
+</script>
+
+</body>
+</html>

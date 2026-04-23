@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# 사용자별 페이지는 크롤링 제외
+Disallow: /account.html
+Disallow: /admin.html
+
+Sitemap: https://jomun-yeonseub.netlify.app/sitemap.xml
