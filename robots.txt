@@ -5,4 +5,4 @@ Allow: /
 Disallow: /account.html
 Disallow: /admin.html
 
-Sitemap: https://jomun-yeonseub.netlify.app/sitemap.xml
+Sitemap: https://jomun-yeonseub-deploy-psi.vercel.app/sitemap.xml
