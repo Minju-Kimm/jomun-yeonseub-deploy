@@ -38,10 +38,58 @@
   .quick-add-btn { padding: 10px 14px; background: var(--brand); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; flex-shrink: 0; transition: background 0.15s; }
   .quick-add-btn:hover { background: var(--brand-hover); }
 
-  .cat-tabs { display: flex; gap: 4px; padding: 0 16px 12px; border-bottom: 1px solid var(--border); }
-  .cat-tab { flex: 1; padding: 7px 4px; font-size: 12px; font-weight: 600; background: transparent; border: none; color: var(--text-mute); cursor: pointer; border-radius: 7px; transition: all 0.15s; font-family: inherit; }
-  .cat-tab.active { background: var(--text); color: white; }
-  .cat-tab:not(.active):hover { background: var(--border); color: var(--text); }
+  /* 폴더 내비게이션 */
+  .folder-nav { padding: 8px 8px 4px; border-bottom: 1px solid var(--border); }
+  .folder-nav-item {
+    display: flex; align-items: center; gap: 6px; width: 100%;
+    padding: 7px 8px; border-radius: 8px; border: none; background: transparent;
+    cursor: pointer; font-family: inherit; font-size: 13px; color: var(--text-sub);
+    text-align: left; transition: background 0.1s; position: relative;
+  }
+  .folder-nav-item:hover { background: var(--border); color: var(--text); }
+  .folder-nav-item.active { background: var(--brand-sub); color: var(--brand); font-weight: 600; }
+  .folder-icon { font-size: 13px; flex-shrink: 0; width: 18px; text-align: center; }
+  .folder-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .folder-count { font-size: 11px; font-weight: 600; color: var(--text-mute); flex-shrink: 0; }
+  .folder-nav-item.active .folder-count { color: var(--brand); opacity: 0.7; }
+  .folder-actions { display: none; gap: 2px; flex-shrink: 0; }
+  .folder-nav-item:hover .folder-actions,
+  .folder-nav-item.active .folder-actions { display: flex; }
+  .folder-action-btn {
+    width: 22px; height: 22px; border: none; background: transparent;
+    cursor: pointer; border-radius: 5px; display: flex; align-items: center;
+    justify-content: center; font-size: 11px; color: var(--text-mute);
+    transition: all 0.15s; padding: 0; font-family: inherit;
+  }
+  .folder-action-btn:hover { background: var(--border-strong); color: var(--text); }
+  .add-folder-btn {
+    display: flex; align-items: center; gap: 6px; width: 100%;
+    padding: 7px 8px; border-radius: 8px; border: none; background: transparent;
+    cursor: pointer; font-family: inherit; font-size: 12px; font-weight: 600;
+    color: var(--text-mute); text-align: left; transition: all 0.15s; margin-top: 2px;
+  }
+  .add-folder-btn:hover { background: var(--border); color: var(--brand); }
+  .folder-inline-row { display: flex; gap: 6px; padding: 4px 0; }
+  .folder-inline-input {
+    flex: 1; padding: 7px 10px; border: 1.5px solid var(--brand); border-radius: 8px;
+    font-size: 13px; font-family: inherit; background: white; color: var(--text); outline: none;
+  }
+  .folder-inline-ok {
+    padding: 7px 12px; background: var(--brand); color: white; border: none;
+    border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit;
+  }
+  /* 폴더 이동 드롭다운 */
+  .folder-move-menu {
+    position: fixed; z-index: 300; background: white; border: 1px solid var(--border-strong);
+    border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); padding: 6px; min-width: 160px;
+  }
+  .folder-move-option {
+    display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px;
+    border: none; background: transparent; cursor: pointer; font-family: inherit;
+    font-size: 14px; color: var(--text); border-radius: 7px; text-align: left; transition: background 0.1s;
+  }
+  .folder-move-option:hover { background: var(--border); }
+  .folder-move-option.active { font-weight: 600; color: var(--brand); }
 
   .sidebar-search { padding: 12px 16px 8px; }
   .sidebar-search input { width: 100%; padding: 9px 12px; border: 1px solid var(--border-strong); border-radius: 9px; font-size: 13px; font-family: inherit; background: var(--bg-card); color: var(--text); outline: none; transition: border-color 0.15s; }
@@ -335,12 +383,7 @@
       <input class="quick-add-input" id="quickAddInput" placeholder="제목 입력 후 Enter 또는 + 클릭" type="text">
       <button class="quick-add-btn" id="quickAddBtn" title="카드 추가">+</button>
     </div>
-    <div class="cat-tabs">
-      <button class="cat-tab active" data-cat="전체">전체</button>
-      <button class="cat-tab" data-cat="판례">판례</button>
-      <button class="cat-tab" data-cat="학설">학설</button>
-      <button class="cat-tab" data-cat="기타">기타</button>
-    </div>
+    <div class="folder-nav" id="folderNav"></div>
     <div class="sidebar-search">
       <input type="text" id="searchInput" placeholder="카드 검색">
     </div>
@@ -361,7 +404,7 @@
 <div class="toast" id="toast"></div>
 
 <script type="module">
-  import { auth, blanks as blanksAPI, customCards as cardsAPI, profile as profileAPI, renderAuthNav } from './supabase-client.js';
+  import { auth, blanks as blanksAPI, customCards as cardsAPI, cardFolders as foldersAPI, profile as profileAPI, renderAuthNav } from './supabase-client.js';
 
   renderAuthNav();
 
@@ -369,12 +412,13 @@
 
   const state = {
     cards: [],
+    folders: [],
     currentCardId: null,
     mode: 'edit',
     blanks: {},
     isLoggedIn: false,
     isPremium: false,
-    filter: '전체',
+    activeFolderId: null, // null=전체, '__none__'=폴더없음, uuid=특정폴더
   };
 
   let currentCreateType = 'fill-blank';
@@ -398,11 +442,13 @@
       document.getElementById('cardList').innerHTML = '<li class="empty-list">로그인 후 이용하세요</li>';
       document.getElementById('quickAddInput').disabled = true;
     } else {
-      [state.blanks, state.cards, state.isPremium] = await Promise.all([
+      [state.blanks, state.cards, state.folders, state.isPremium] = await Promise.all([
         blanksAPI.getAll(),
         cardsAPI ? cardsAPI.getAll() : Promise.resolve([]),
+        foldersAPI ? foldersAPI.getAll() : Promise.resolve([]),
         profileAPI ? profileAPI.isPremium().catch(() => false) : Promise.resolve(false),
       ]);
+      renderFolderNav();
       renderCardList();
     }
   } catch(e) {
@@ -410,16 +456,6 @@
     document.getElementById('cardList').innerHTML =
       `<li class="empty-list" style="color:var(--danger)">오류: ${e.message}<br><small style="color:var(--text-mute)">Ctrl+Shift+R 로 새로고침해주세요</small></li>`;
   }
-
-  // 탭 필터
-  document.querySelectorAll('.cat-tab').forEach(btn => {
-    btn.onclick = () => {
-      document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      state.filter = btn.dataset.cat;
-      renderCardList();
-    };
-  });
 
   // 검색
   let searchTimer;
@@ -440,6 +476,173 @@
     if (e.key === 'Enter') { e.preventDefault(); triggerQuickAdd(); }
   });
   document.getElementById('quickAddBtn').addEventListener('click', triggerQuickAdd);
+
+  // === 폴더 네비게이션 ===
+  function renderFolderNav() {
+    const nav = document.getElementById('folderNav');
+    if (!nav) return;
+
+    const totalCount = state.cards.length;
+    const noneCount = state.cards.filter(c => !c.folder_id).length;
+
+    let html = '';
+    html += `
+      <button class="folder-nav-item ${state.activeFolderId === null ? 'active' : ''}" data-folder="__all__">
+        <span class="folder-icon">≡</span>
+        <span class="folder-name">모든 카드</span>
+        <span class="folder-count">${totalCount}</span>
+      </button>
+      <button class="folder-nav-item ${state.activeFolderId === '__none__' ? 'active' : ''}" data-folder="__none__">
+        <span class="folder-icon">□</span>
+        <span class="folder-name">폴더 없음</span>
+        <span class="folder-count">${noneCount}</span>
+      </button>
+    `;
+
+    state.folders.forEach(f => {
+      const count = state.cards.filter(c => c.folder_id === f.id).length;
+      const isActive = state.activeFolderId === f.id;
+      html += `
+        <button class="folder-nav-item ${isActive ? 'active' : ''}" data-folder="${f.id}">
+          <span class="folder-icon">📁</span>
+          <span class="folder-name">${escapeHtml(f.name)}</span>
+          <span class="folder-count">${count}</span>
+          <span class="folder-actions">
+            <button class="folder-action-btn" data-action="rename" data-id="${f.id}" title="이름 변경">✏</button>
+            <button class="folder-action-btn" data-action="delete" data-id="${f.id}" title="삭제">✕</button>
+          </span>
+        </button>
+      `;
+    });
+
+    html += `<button class="add-folder-btn" id="addFolderBtn">+ 폴더 만들기</button>`;
+    nav.innerHTML = html;
+
+    nav.querySelectorAll('.folder-nav-item[data-folder]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        if (e.target.closest('.folder-actions')) return;
+        const f = btn.dataset.folder;
+        state.activeFolderId = f === '__all__' ? null : f;
+        renderFolderNav();
+        renderCardList();
+      });
+    });
+
+    nav.querySelectorAll('.folder-action-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const { action, id } = btn.dataset;
+        if (action === 'rename') await promptRenameFolder(id, btn);
+        if (action === 'delete') await promptDeleteFolder(id);
+      });
+    });
+
+    document.getElementById('addFolderBtn')?.addEventListener('click', promptCreateFolder);
+  }
+
+  function promptCreateFolder() {
+    const nav = document.getElementById('folderNav');
+    if (!nav) return;
+    const addBtn = document.getElementById('addFolderBtn');
+    if (!addBtn) return;
+
+    const row = document.createElement('div');
+    row.className = 'folder-inline-row';
+    row.innerHTML = `
+      <input class="folder-inline-input" id="newFolderInput" placeholder="폴더 이름" maxlength="30" type="text">
+      <button class="folder-inline-ok" id="newFolderOk">확인</button>
+    `;
+    nav.insertBefore(row, addBtn);
+
+    const input = document.getElementById('newFolderInput');
+    input.focus();
+
+    const confirm = async () => {
+      const name = input.value.trim();
+      if (!name) { input.focus(); return; }
+      const { data, error } = await foldersAPI.create(name);
+      if (error || !data) { toast('폴더 생성 실패'); return; }
+      state.folders.push(data);
+      state.activeFolderId = data.id;
+      renderFolderNav();
+      renderCardList();
+      toast(`"${name}" 폴더가 만들어졌습니다`);
+    };
+
+    document.getElementById('newFolderOk').addEventListener('click', confirm);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') confirm(); if (e.key === 'Escape') renderFolderNav(); });
+  }
+
+  async function promptRenameFolder(id) {
+    const folder = state.folders.find(f => f.id === id);
+    if (!folder) return;
+    const name = window.prompt('폴더 이름 변경', folder.name);
+    if (!name || name.trim() === folder.name) return;
+    const { error } = await foldersAPI.rename(id, name.trim());
+    if (error) { toast('이름 변경 실패'); return; }
+    folder.name = name.trim();
+    renderFolderNav();
+    toast('폴더 이름이 변경되었습니다');
+  }
+
+  async function promptDeleteFolder(id) {
+    const folder = state.folders.find(f => f.id === id);
+    if (!folder) return;
+    const count = state.cards.filter(c => c.folder_id === id).length;
+    const msg = count > 0
+      ? `"${folder.name}" 폴더를 삭제할까요?\n카드 ${count}개는 '폴더 없음'으로 이동됩니다.`
+      : `"${folder.name}" 폴더를 삭제할까요?`;
+    if (!window.confirm(msg)) return;
+
+    const { error } = await foldersAPI.remove(id);
+    if (error) { toast('폴더 삭제 실패'); return; }
+
+    state.folders = state.folders.filter(f => f.id !== id);
+    state.cards.forEach(c => { if (c.folder_id === id) c.folder_id = null; });
+    if (state.activeFolderId === id) state.activeFolderId = null;
+    renderFolderNav();
+    renderCardList();
+    toast('폴더가 삭제되었습니다');
+  }
+
+  function showFolderMoveMenu(card, anchorEl) {
+    document.querySelector('.folder-move-menu')?.remove();
+
+    const menu = document.createElement('div');
+    menu.className = 'folder-move-menu';
+
+    const options = [{ id: null, name: '폴더 없음' }, ...state.folders];
+    menu.innerHTML = options.map(f => {
+      const isActive = (f.id === null && !card.folder_id) || f.id === card.folder_id;
+      return `<button class="folder-move-option ${isActive ? 'active' : ''}" data-fid="${f.id || ''}">
+        ${isActive ? '✓ ' : ''}${escapeHtml(f.name)}
+      </button>`;
+    }).join('');
+
+    document.body.appendChild(menu);
+    const rect = anchorEl.getBoundingClientRect();
+    menu.style.top = (rect.bottom + 4) + 'px';
+    menu.style.left = Math.min(rect.left, window.innerWidth - 200) + 'px';
+
+    menu.querySelectorAll('.folder-move-option').forEach(opt => {
+      opt.addEventListener('click', async () => {
+        const fid = opt.dataset.fid || null;
+        await cardsAPI.update(card.id, { folder_id: fid || null });
+        const c = state.cards.find(x => x.id === card.id);
+        if (c) c.folder_id = fid || null;
+        menu.remove();
+        renderFolderNav();
+        renderCardList();
+        renderMain();
+        const fn = fid ? state.folders.find(f => f.id === fid)?.name : '폴더 없음';
+        toast(`"${fn}"으로 이동했습니다`);
+      });
+    });
+
+    setTimeout(() => {
+      document.addEventListener('click', () => menu.remove(), { once: true });
+    }, 0);
+  }
 
   // === 사이드바 렌더링 ===
   function getCardSearchText(c) {
@@ -464,7 +667,11 @@
     const list = document.getElementById('cardList');
     const kw = searchInput.value.trim().toLowerCase();
     let cards = state.cards;
-    if (state.filter !== '전체') cards = cards.filter(c => c.category === state.filter);
+    if (state.activeFolderId === '__none__') {
+      cards = cards.filter(c => !c.folder_id);
+    } else if (state.activeFolderId !== null) {
+      cards = cards.filter(c => c.folder_id === state.activeFolderId);
+    }
     if (kw) cards = cards.filter(c => {
       const searchable = c.title + ' ' + getCardSearchText(c);
       return searchable.toLowerCase().includes(kw);
@@ -538,6 +745,13 @@
             <option value="판례">판례</option>
             <option value="학설">학설</option>
             <option value="기타" selected>기타</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">폴더</label>
+          <select class="form-select" id="newFolder">
+            <option value="">폴더 없음</option>
+            ${state.folders.map(f => `<option value="${f.id}" ${state.activeFolderId === f.id ? 'selected' : ''}>${escapeHtml(f.name)}</option>`).join('')}
           </select>
         </div>
 
@@ -680,6 +894,8 @@
       body = JSON.stringify({ q, a });
     }
 
+    const folderId = document.getElementById('newFolder')?.value || null;
+
     if (!title) { showCreateError('제목을 입력해주세요.'); titleEl?.focus(); return; }
 
     if (!state.isPremium && state.cards.length >= FREE_CARD_LIMIT) {
@@ -692,7 +908,7 @@
     saveBtn.disabled = true;
     saveBtn.textContent = '저장 중...';
 
-    const { data, error } = await cardsAPI.create(title, body, category, currentCreateType);
+    const { data, error } = await cardsAPI.create(title, body, category, currentCreateType, folderId || null);
     if (error || !data) {
       showCreateError('저장 실패: ' + (error?.message || '알 수 없는 오류'));
       saveBtn.disabled = false;
@@ -703,6 +919,7 @@
     state.cards.unshift(data);
     state.currentCardId = data.id;
     state.mode = 'edit';
+    renderFolderNav();
     renderCardList();
     renderMain();
     toast(`"${title}" 카드가 추가되었습니다`);
@@ -735,6 +952,24 @@
     else if (ct === 'subjective') renderSubjectiveCard(card);
     else if (ct === 'table') renderTableCard(card);
     else renderFillBlankCard(card);
+    injectFolderMoveBtn(card);
+  }
+
+  function injectFolderMoveBtn(card) {
+    if (!state.folders.length && !card.folder_id) return;
+    const headerActions = document.querySelector('.header-actions');
+    if (!headerActions) return;
+    const folder = card.folder_id ? state.folders.find(f => f.id === card.folder_id) : null;
+    const folderLabel = folder ? folder.name : '폴더 없음';
+    const btn = document.createElement('button');
+    btn.className = 'tool-btn';
+    btn.title = '폴더 이동';
+    btn.innerHTML = `📁 ${escapeHtml(folderLabel)} ▾`;
+    btn.style.cssText = 'font-size:13px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+    btn.onclick = (e) => { e.stopPropagation(); showFolderMoveMenu(card, btn); };
+    const deleteBtn = headerActions.querySelector('.tool-btn.danger');
+    if (deleteBtn) headerActions.insertBefore(btn, deleteBtn);
+    else headerActions.appendChild(btn);
   }
 
   // === 빈칸 채우기 카드 ===
@@ -1411,6 +1646,7 @@
     state.cards = state.cards.filter(c => c.id !== id);
     delete state.blanks[blankKey];
     state.currentCardId = null;
+    renderFolderNav();
     renderCardList();
     document.getElementById('mainArea').innerHTML = `
       <div class="empty-state"><h3>카드를 선택하세요</h3><p>왼쪽에서 카드를 선택하거나 새 카드를 추가하세요.</p></div>

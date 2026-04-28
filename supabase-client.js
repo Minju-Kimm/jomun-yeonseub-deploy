@@ -226,12 +226,14 @@ export const customCards = {
     if (error) { console.warn('커스텀 카드 조회 실패:', error.message); return []; }
     return data || [];
   },
-  async create(title, body, category = '기타', cardType = 'fill-blank') {
+  async create(title, body, category = '기타', cardType = 'fill-blank', folderId = null) {
     const user = await auth.getUser();
     if (!user) return { data: null, error: new Error('로그인이 필요합니다') };
+    const row = { user_id: user.id, title, body, category, card_type: cardType };
+    if (folderId) row.folder_id = folderId;
     const { data, error } = await supabase
       .from('custom_cards')
-      .insert({ user_id: user.id, title, body, category, card_type: cardType })
+      .insert(row)
       .select()
       .single();
     return { data, error };
@@ -251,6 +253,53 @@ export const customCards = {
     if (!user) return { error: new Error('로그인이 필요합니다') };
     const { error } = await supabase
       .from('custom_cards')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', user.id);
+    return { error };
+  },
+};
+
+// ============================================================
+// 카드 폴더 유틸
+// ============================================================
+export const cardFolders = {
+  async getAll() {
+    const user = await auth.getUser();
+    if (!user) return [];
+    const { data, error } = await supabase
+      .from('card_folders')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: true });
+    if (error) { console.warn('폴더 조회 실패:', error.message); return []; }
+    return data || [];
+  },
+  async create(name) {
+    const user = await auth.getUser();
+    if (!user) return { data: null, error: new Error('로그인이 필요합니다') };
+    const { data, error } = await supabase
+      .from('card_folders')
+      .insert({ user_id: user.id, name })
+      .select()
+      .single();
+    return { data, error };
+  },
+  async rename(id, name) {
+    const user = await auth.getUser();
+    if (!user) return { error: new Error('로그인이 필요합니다') };
+    const { error } = await supabase
+      .from('card_folders')
+      .update({ name })
+      .eq('id', id)
+      .eq('user_id', user.id);
+    return { error };
+  },
+  async remove(id) {
+    const user = await auth.getUser();
+    if (!user) return { error: new Error('로그인이 필요합니다') };
+    const { error } = await supabase
+      .from('card_folders')
       .delete()
       .eq('id', id)
       .eq('user_id', user.id);
