@@ -394,6 +394,7 @@
   };
 
   // ── INIT ──────────────────────────────────────────────────
+  (async () => {
   try {
     const user = await auth.getUser();
     if (!user) {
@@ -445,6 +446,7 @@
     document.getElementById('dashGreet').textContent = '오류가 발생했습니다';
     document.getElementById('dashSub').textContent = e.message;
   }
+  })();
 
   // ── LAW PROGRESS ──────────────────────────────────────────
   async function renderLawProgress(allBlanks) {
