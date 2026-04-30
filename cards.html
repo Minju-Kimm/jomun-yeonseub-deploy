@@ -1257,8 +1257,8 @@
         <div class="toolbar-hint">
           <span class="hint-icon">${state.mode === 'edit' ? '!' : '?'}</span>
           ${state.mode === 'edit'
-            ? '표의 <strong>셀을 클릭</strong>하면 빈칸이 됩니다. 빈칸 셀을 다시 클릭하면 해제됩니다.'
-            : '빈칸 셀을 클릭하면 내용이 나타납니다.'}
+            ? '<strong>클릭</strong> → 셀 전체 빈칸 &nbsp;|&nbsp; <strong>드래그</strong> → 셀 안 특정 텍스트 빈칸 &nbsp;|&nbsp; 빈칸 클릭 → 해제'
+            : '빈칸 셀 또는 빈칸 텍스트를 클릭하면 내용이 나타납니다.'}
         </div>
         <div class="toolbar-actions">
           ${state.mode === 'edit' ? `
@@ -1284,6 +1284,30 @@
     renderTableBody(card);
   }
 
+  // --- 표 빈칸 헬퍼 ---
+  function isCellBlank(r, c, blanks) {
+    return blanks.some(b => b.row === r && b.col === c && !b.isText);
+  }
+  function getCellTextBlanks(r, c, blanks) {
+    return blanks.filter(b => b.row === r && b.col === c && b.isText)
+      .sort((a, b) => a.start - b.start);
+  }
+  function buildCellTextHtml(cellText, textBlanks, mode, row, col) {
+    let html = '';
+    let cursor = 0;
+    textBlanks.forEach((b, i) => {
+      html += escapeHtml(cellText.slice(cursor, b.start));
+      if (mode === 'study') {
+        html += `<span class="blank-span in-study" data-row="${row}" data-col="${col}" data-idx="${i}" data-hint="빈칸 ${i+1}">${escapeHtml(b.text)}</span>`;
+      } else {
+        html += `<span class="blank-span" data-row="${row}" data-col="${col}" data-idx="${i}">${escapeHtml(b.text)}</span>`;
+      }
+      cursor = b.end;
+    });
+    html += escapeHtml(cellText.slice(cursor));
+    return html;
+  }
+
   function renderTableBody(card) {
     const container = document.getElementById('tableContainer');
     if (!container) return;
@@ -1296,53 +1320,84 @@
 
     const blankKey = 'custom-' + card.id;
     const tableBlanks = state.blanks[blankKey] || [];
-    function isBlank(r, c) { return tableBlanks.some(b => b.row === r && b.col === c); }
 
-    const [headerRow, ...dataRows] = rows;
-
-    let html = '<table class="study-table"><thead><tr>';
-    headerRow.forEach((cell, ci) => {
-      if (cell === null) return;
-      const blanked = isBlank(0, ci);
-      const cls = blanked ? (state.mode === 'edit' ? 'cell-blanked' : 'cell-hidden') : '';
-      const display = blanked && state.mode === 'study' ? '' : escapeHtml(cell.t);
+    const buildCellEl = (cell, ri, ci) => {
+      if (cell === null) return '';
+      const tag = ri === 0 ? 'th' : 'td';
+      const cellBlanked = isCellBlank(ri, ci, tableBlanks);
+      const textBlanks = getCellTextBlanks(ri, ci, tableBlanks);
       const rs = cell.r > 1 ? ` rowspan="${cell.r}"` : '';
       const cs = cell.c > 1 ? ` colspan="${cell.c}"` : '';
-      html += `<th${rs}${cs} class="${cls}" data-row="0" data-col="${ci}" data-text="${escapeHtml(cell.t)}">${display}</th>`;
-    });
-    html += '</tr></thead><tbody>';
+      let cls = '';
+      let display = '';
+      if (cellBlanked) {
+        cls = state.mode === 'edit' ? 'cell-blanked' : 'cell-hidden';
+        display = state.mode === 'study' ? '' : escapeHtml(cell.t);
+      } else if (textBlanks.length > 0) {
+        display = buildCellTextHtml(cell.t, textBlanks, state.mode, ri, ci);
+      } else {
+        display = escapeHtml(cell.t);
+      }
+      return `<${tag}${rs}${cs} class="${cls}" data-row="${ri}" data-col="${ci}" data-text="${escapeHtml(cell.t)}">${display}</${tag}>`;
+    };
 
+    const [headerRow, ...dataRows] = rows;
+    let html = '<table class="study-table"><thead><tr>';
+    headerRow.forEach((cell, ci) => { html += buildCellEl(cell, 0, ci); });
+    html += '</tr></thead><tbody>';
     dataRows.forEach((row, ri) => {
-      const actualRow = ri + 1;
       html += '<tr>';
-      row.forEach((cell, ci) => {
-        if (cell === null) return;
-        const blanked = isBlank(actualRow, ci);
-        const cls = blanked ? (state.mode === 'edit' ? 'cell-blanked' : 'cell-hidden') : '';
-        const display = blanked && state.mode === 'study' ? '' : escapeHtml(cell.t);
-        const rs = cell.r > 1 ? ` rowspan="${cell.r}"` : '';
-        const cs = cell.c > 1 ? ` colspan="${cell.c}"` : '';
-        html += `<td${rs}${cs} class="${cls}" data-row="${actualRow}" data-col="${ci}" data-text="${escapeHtml(cell.t)}">${display}</td>`;
-      });
+      row.forEach((cell, ci) => { html += buildCellEl(cell, ri + 1, ci); });
       html += '</tr>';
     });
     html += '</tbody></table>';
-
     container.innerHTML = html;
 
     if (state.mode === 'edit') {
-      container.querySelectorAll('td, th').forEach(cell => {
-        cell.style.cursor = 'pointer';
-        cell.onclick = () => toggleTableCell(
-          parseInt(cell.dataset.row), parseInt(cell.dataset.col), cell.dataset.text, card
-        );
+      container.querySelectorAll('td, th').forEach(cellEl => {
+        cellEl.style.cursor = 'pointer';
+        const r = parseInt(cellEl.dataset.row);
+        const c = parseInt(cellEl.dataset.col);
+        const text = cellEl.dataset.text;
+
+        // 텍스트 빈칸 스팬: 클릭으로 제거
+        cellEl.querySelectorAll('.blank-span').forEach(span => {
+          span.addEventListener('mouseup', e => e.stopPropagation());
+          span.addEventListener('click', e => {
+            e.stopPropagation();
+            removeTableTextBlank(r, c, parseInt(span.dataset.idx), card);
+          });
+        });
+
+        cellEl.addEventListener('mouseup', e => {
+          const sel = window.getSelection();
+          if (sel && !sel.isCollapsed && sel.rangeCount > 0) {
+            const range = sel.getRangeAt(0);
+            if (cellEl.contains(range.commonAncestorContainer) || cellEl === range.commonAncestorContainer) {
+              const result = getTableCellOffset(cellEl, range);
+              if (result) {
+                sel.removeAllRanges();
+                addTableTextBlank(r, c, result.start, result.end, result.text, card);
+                return;
+              }
+            }
+          }
+          // 선택 없음: 셀 전체 빈칸 토글 (단, 이미 텍스트 빈칸이 있는 셀은 제외)
+          const current = state.blanks['custom-' + card.id] || [];
+          if (!getCellTextBlanks(r, c, current).length) {
+            toggleTableCell(r, c, text, card);
+          }
+        });
       });
     } else {
-      container.querySelectorAll('.cell-hidden').forEach(cell => {
-        cell.onclick = () => {
-          const revealed = cell.classList.toggle('cell-revealed');
-          cell.textContent = revealed ? cell.dataset.text : '';
+      container.querySelectorAll('.cell-hidden').forEach(cellEl => {
+        cellEl.onclick = () => {
+          const revealed = cellEl.classList.toggle('cell-revealed');
+          cellEl.textContent = revealed ? cellEl.dataset.text : '';
         };
+      });
+      container.querySelectorAll('.blank-span.in-study').forEach(span => {
+        span.onclick = () => span.classList.toggle('revealed');
       });
     }
   }
@@ -1351,7 +1406,7 @@
     const blankKey = 'custom-' + card.id;
     if (!state.blanks[blankKey]) state.blanks[blankKey] = [];
 
-    const idx = state.blanks[blankKey].findIndex(b => b.row === row && b.col === col);
+    const idx = state.blanks[blankKey].findIndex(b => b.row === row && b.col === col && !b.isText);
     if (idx >= 0) {
       state.blanks[blankKey].splice(idx, 1);
       if (state.blanks[blankKey].length === 0) delete state.blanks[blankKey];
@@ -1363,6 +1418,51 @@
 
     renderMain();
     await blanksAPI.save(blankKey, state.blanks[blankKey] || []);
+  }
+
+  function getTableCellOffset(cellEl, range) {
+    const start = getTextOffset(cellEl, range.startContainer, range.startOffset);
+    const end = getTextOffset(cellEl, range.endContainer, range.endOffset);
+    if (start === null || end === null || start >= end) return null;
+    const text = cellEl.dataset.text;
+    if (end > text.length) return null;
+    const selectedText = text.slice(start, end);
+    if (!selectedText.trim()) return null;
+    return { start, end, text: selectedText };
+  }
+
+  async function addTableTextBlank(row, col, start, end, selectedText, card) {
+    const blankKey = 'custom-' + card.id;
+    if (!state.blanks[blankKey]) state.blanks[blankKey] = [];
+
+    // 기존 텍스트 빈칸과 겹침 체크
+    const existing = getCellTextBlanks(row, col, state.blanks[blankKey]);
+    for (const b of existing) {
+      if (!(end <= b.start || start >= b.end)) { toast('기존 빈칸과 겹칩니다'); return; }
+    }
+    // 셀 전체 빈칸이 있으면 추가 불가
+    if (isCellBlank(row, col, state.blanks[blankKey])) { toast('셀 전체 빈칸을 먼저 해제하세요'); return; }
+
+    state.blanks[blankKey].push({ row, col, isText: true, start, end, text: selectedText });
+    renderMain();
+    toast(`빈칸 추가: "${truncate(selectedText, 20)}"`);
+    await blanksAPI.save(blankKey, state.blanks[blankKey]);
+  }
+
+  async function removeTableTextBlank(row, col, idx, card) {
+    const blankKey = 'custom-' + card.id;
+    if (!state.blanks[blankKey]) return;
+    const textBlanks = getCellTextBlanks(row, col, state.blanks[blankKey]);
+    const target = textBlanks[idx];
+    if (!target) return;
+    const globalIdx = state.blanks[blankKey].indexOf(target);
+    if (globalIdx >= 0) {
+      const removed = state.blanks[blankKey].splice(globalIdx, 1)[0];
+      if (state.blanks[blankKey].length === 0) delete state.blanks[blankKey];
+      renderMain();
+      toast(`빈칸 삭제: "${truncate(removed.text, 20)}"`);
+      await blanksAPI.save(blankKey, state.blanks[blankKey] || []);
+    }
   }
 
   // === 표 에디터 (생성 폼) ===
