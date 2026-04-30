@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>학습 관리 | 조문연습</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Pretendard:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F9FAFB; --bg-card: #FFFFFF; --text: #191F28; --text-sub: #4E5968;
+    --text-mute: #8B95A1; --border: #F2F4F6; --border-strong: #E5E8EB;
+    --brand: #3182F6; --brand-sub: #E8F3FF;
+    --success: #00C471; --success-sub: #E6F9F0;
+    --danger: #F04452; --danger-sub: #FFEBED;
+    --warning: #F59E0B; --warning-sub: #FEF3C7;
+    --radius: 16px; --radius-lg: 24px;
+    --shadow: 0 2px 16px rgba(0,0,0,0.06);
+    --shadow-lg: 0 8px 40px rgba(0,0,0,0.10);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { font-family:'Pretendard',-apple-system,BlinkMacSystemFont,sans-serif; background:var(--bg); color:var(--text); line-height:1.6; -webkit-font-smoothing:antialiased; letter-spacing:-0.01em; }
+
+  /* NAV */
+  nav { position:sticky; top:0; background:rgba(249,250,251,0.9); backdrop-filter:saturate(180%) blur(12px); -webkit-backdrop-filter:saturate(180%) blur(12px); z-index:100; border-bottom:1px solid var(--border); }
+  .nav-inner { display:flex; align-items:center; justify-content:space-between; height:64px; max-width:1080px; margin:0 auto; padding:0 24px; }
+  .logo { font-size:18px; font-weight:800; color:var(--text); text-decoration:none; letter-spacing:-0.03em; }
+  .nav-links { display:flex; gap:28px; align-items:center; }
+  .nav-links a { color:var(--text-sub); text-decoration:none; font-size:15px; font-weight:500; transition:color .15s; }
+  .nav-links a:hover,.nav-links a.active { color:var(--text); }
+  .nav-cta { background:var(--text); color:white!important; padding:8px 16px; border-radius:10px; font-weight:600!important; }
+  .nav-cta:hover { background:#000; }
+
+  .container { max-width:680px; margin:0 auto; padding:0 20px; }
+
+  /* LOADING */
+  #screenLoading { display:flex; align-items:center; justify-content:center; min-height:calc(100vh - 64px); flex-direction:column; gap:16px; color:var(--text-mute); }
+  .spinner { width:32px; height:32px; border:3px solid var(--border); border-top-color:var(--brand); border-radius:50%; animation:spin .8s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+
+  /* ===== DASHBOARD ===== */
+  #screenDash { padding:48px 0 80px; }
+  .dash-hero { text-align:center; margin-bottom:40px; }
+  .dash-hero h1 { font-size:34px; font-weight:900; letter-spacing:-0.04em; margin-bottom:8px; }
+  .dash-hero p { font-size:16px; color:var(--text-sub); }
+
+  .stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:28px; }
+  .stat-card { background:var(--bg-card); border-radius:var(--radius-lg); padding:24px 16px; box-shadow:var(--shadow); border:1px solid var(--border); text-align:center; transition:transform .15s,box-shadow .15s; }
+  .stat-card:hover { transform:translateY(-2px); box-shadow:var(--shadow-lg); }
+  .stat-card.hi { background:var(--brand); border-color:var(--brand); }
+  .stat-num { font-size:40px; font-weight:900; letter-spacing:-0.04em; line-height:1; margin-bottom:8px; }
+  .stat-card.hi .stat-num { color:#fff; }
+  .stat-lbl { font-size:12px; font-weight:600; color:var(--text-mute); }
+  .stat-card.hi .stat-lbl { color:rgba(255,255,255,.75); }
+
+  .start-wrap { text-align:center; margin-bottom:52px; }
+  .start-btn { display:inline-flex; align-items:center; gap:10px; padding:18px 52px; background:var(--brand); color:white; border:none; border-radius:100px; font-size:17px; font-weight:700; cursor:pointer; font-family:inherit; letter-spacing:-0.01em; transition:all .2s; box-shadow:0 4px 20px rgba(49,130,246,.3); }
+  .start-btn:hover:not(:disabled) { background:#1B64DA; transform:translateY(-2px); box-shadow:0 8px 28px rgba(49,130,246,.35); }
+  .start-btn:disabled { background:var(--border-strong); color:var(--text-mute); box-shadow:none; cursor:not-allowed; }
+
+  .sect { margin-bottom:40px; }
+  .sect-hd { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+  .sect-title { font-size:20px; font-weight:800; letter-spacing:-0.03em; }
+  .sect-link { font-size:14px; color:var(--brand); font-weight:600; text-decoration:none; }
+  .sect-link:hover { text-decoration:underline; }
+
+  /* Law progress */
+  .law-card { background:var(--bg-card); border-radius:var(--radius); padding:18px 22px; box-shadow:var(--shadow); border:1px solid var(--border); margin-bottom:10px; display:flex; align-items:center; gap:16px; }
+  .law-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+  .law-info { flex:1; min-width:0; }
+  .law-name { font-size:15px; font-weight:700; margin-bottom:6px; }
+  .law-bar-row { display:flex; align-items:center; gap:10px; }
+  .law-bar { flex:1; height:7px; background:var(--border); border-radius:100px; overflow:hidden; }
+  .law-bar-fill { height:100%; border-radius:100px; width:0%; transition:width .8s cubic-bezier(.34,1.56,.64,1); }
+  .law-pct { font-size:12px; font-weight:700; color:var(--text-mute); min-width:70px; text-align:right; }
+
+  /* Mastery grid */
+  .mastery-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .mastery-item { background:var(--bg-card); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow); border:1px solid var(--border); display:flex; align-items:center; gap:12px; }
+  .ring-svg { transform:rotate(-90deg); flex-shrink:0; }
+  .ring-track { fill:none; stroke:var(--border); }
+  .ring-fill { fill:none; stroke-linecap:round; transition:stroke-dashoffset .8s cubic-bezier(.34,1.56,.64,1); }
+  .mastery-info { flex:1; min-width:0; }
+  .mastery-title { font-size:13px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-bottom:2px; }
+  .mastery-sub { font-size:11px; color:var(--text-mute); font-weight:500; }
+  .mastery-empty { grid-column:1/-1; text-align:center; padding:28px; color:var(--text-mute); font-size:14px; line-height:1.8; }
+
+  /* ===== SESSION ===== */
+  #screenSession { min-height:calc(100vh - 64px); display:flex; flex-direction:column; }
+  .sess-top { display:flex; align-items:center; padding:14px 24px; max-width:720px; margin:0 auto; width:100%; gap:16px; }
+  .exit-btn { background:none; border:none; cursor:pointer; font-family:inherit; font-size:15px; font-weight:600; color:var(--text-sub); padding:8px 12px; border-radius:10px; transition:background .15s; display:flex; align-items:center; gap:6px; flex-shrink:0; }
+  .exit-btn:hover { background:var(--border); color:var(--text); }
+  .sess-prog-bar { flex:1; height:6px; background:var(--border); border-radius:100px; overflow:hidden; }
+  .sess-prog-fill { height:100%; background:var(--brand); border-radius:100px; transition:width .4s ease; }
+  .sess-prog-txt { font-size:14px; font-weight:700; color:var(--text-sub); min-width:42px; text-align:right; }
+
+  .sess-body { flex:1; padding:8px 20px 60px; max-width:720px; margin:0 auto; width:100%; }
+
+  .review-card { background:var(--bg-card); border-radius:var(--radius-lg); padding:40px; box-shadow:var(--shadow-lg); border:1px solid var(--border); margin-bottom:20px; min-height:220px; animation:cardIn .3s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes cardIn { from{opacity:0;transform:translateY(14px) scale(.97)} to{opacity:1;transform:none} }
+  .card-meta { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+  .cat-badge { font-size:12px; font-weight:700; padding:4px 10px; border-radius:6px; background:var(--brand-sub); color:var(--brand); }
+  .type-badge { font-size:12px; font-weight:700; padding:4px 10px; border-radius:6px; }
+  .card-title { font-size:22px; font-weight:800; letter-spacing:-0.03em; margin-bottom:18px; line-height:1.3; }
+  .card-body { font-family:'Gowun Batang',serif; font-size:18px; line-height:2.2; color:var(--text); white-space:pre-wrap; }
+
+  /* Blanks in review */
+  .rv-blank { display:inline-block; border-radius:6px; padding:1px 6px; font-family:'Gowun Batang',serif; transition:all .2s; }
+  .rv-blank.hid { background:var(--brand-sub); color:transparent; min-width:56px; border-bottom:2px solid var(--brand); user-select:none; }
+  .rv-blank.rev { background:var(--success-sub); color:var(--text); border-bottom:2px solid var(--success); }
+  .rv-cell-blank { background:var(--brand-sub)!important; color:transparent!important; min-width:48px; }
+  .rv-cell-reveal { background:var(--success-sub)!important; color:var(--text)!important; }
+  .rv-txt-blank { background:var(--brand-sub); color:transparent; border-bottom:2px solid var(--brand); border-radius:4px; padding:1px 4px; display:inline; font-family:'Gowun Batang',serif; }
+  .rv-txt-reveal { background:var(--success-sub); color:var(--text); border-bottom:2px solid var(--success); }
+  .rv-table { border-collapse:collapse; width:100%; font-family:'Gowun Batang',serif; font-size:16px; }
+  .rv-table th,.rv-table td { border:1px solid var(--border-strong); padding:10px 14px; vertical-align:middle; }
+  .rv-table th { background:var(--border); font-weight:700; text-align:center; font-family:'Pretendard',sans-serif; font-size:13px; }
+
+  /* OX */
+  .ox-btns { display:flex; gap:20px; justify-content:center; margin-top:24px; }
+  .ox-btn { width:96px; height:96px; border-radius:50%; font-size:36px; font-weight:900; border:3px solid transparent; cursor:pointer; font-family:'Pretendard',sans-serif; transition:all .15s; display:flex; align-items:center; justify-content:center; }
+  .ox-o { background:var(--success-sub); color:var(--success); border-color:var(--success); }
+  .ox-o:hover:not(:disabled) { background:var(--success); color:white; transform:scale(1.06); }
+  .ox-x { background:var(--danger-sub); color:var(--danger); border-color:var(--danger); }
+  .ox-x:hover:not(:disabled) { background:var(--danger); color:white; transform:scale(1.06); }
+  .ox-btn:disabled { cursor:not-allowed; transform:none!important; }
+  .ox-correct { background:var(--success)!important; color:white!important; }
+  .ox-wrong { opacity:.22!important; }
+  .rv-result { text-align:center; margin-top:18px; }
+  .rv-result-badge { display:inline-block; padding:10px 28px; border-radius:10px; font-size:17px; font-weight:800; }
+  .rv-correct { background:var(--success-sub); color:var(--success); }
+  .rv-wrong { background:var(--danger-sub); color:var(--danger); }
+  .rv-expl { margin-top:12px; font-size:14px; color:var(--text-sub); line-height:1.7; background:var(--bg); padding:12px 16px; border-radius:10px; border-left:3px solid var(--border-strong); white-space:pre-wrap; text-align:left; }
+
+  /* Subjective */
+  .rv-subj-input { width:100%; min-height:100px; padding:14px 16px; border:1.5px solid var(--border-strong); border-radius:12px; font-size:16px; font-family:'Gowun Batang',serif; background:var(--bg); color:var(--text); outline:none; resize:vertical; line-height:1.8; transition:border-color .15s; margin-top:16px; }
+  .rv-subj-input:focus { border-color:var(--brand); }
+  .rv-model-answer { background:var(--success-sub); border-radius:12px; padding:18px 20px; border-left:4px solid var(--success); font-family:'Gowun Batang',serif; font-size:17px; line-height:2; white-space:pre-wrap; margin-top:16px; }
+
+  /* Reveal + rating */
+  .reveal-area { text-align:center; margin-bottom:16px; }
+  .reveal-btn { padding:15px 44px; background:var(--text); color:white; border:none; border-radius:100px; font-size:16px; font-weight:700; cursor:pointer; font-family:inherit; transition:all .15s; }
+  .reveal-btn:hover { background:#000; transform:translateY(-1px); }
+
+  .rating-area { }
+  .rating-lbl { text-align:center; font-size:13px; color:var(--text-mute); font-weight:600; margin-bottom:12px; letter-spacing:.02em; text-transform:uppercase; }
+  .rating-btns { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .rate-btn { padding:14px 6px; border:2px solid transparent; border-radius:14px; cursor:pointer; font-family:inherit; display:flex; flex-direction:column; align-items:center; gap:5px; transition:all .15s; }
+  .rate-lbl { font-size:15px; font-weight:700; }
+  .rate-int { font-size:11px; font-weight:600; }
+  .rate-again { background:var(--danger-sub); border-color:rgba(240,68,82,.15); }
+  .rate-again .rate-lbl { color:var(--danger); }
+  .rate-again .rate-int { color:rgba(240,68,82,.55); }
+  .rate-again:hover { background:var(--danger); border-color:var(--danger); }
+  .rate-again:hover .rate-lbl,.rate-again:hover .rate-int { color:white; }
+  .rate-hard { background:#FFF3E0; border-color:rgba(245,158,11,.15); }
+  .rate-hard .rate-lbl { color:var(--warning); }
+  .rate-hard .rate-int { color:rgba(245,158,11,.55); }
+  .rate-hard:hover { background:var(--warning); border-color:var(--warning); }
+  .rate-hard:hover .rate-lbl,.rate-hard:hover .rate-int { color:white; }
+  .rate-good { background:var(--brand-sub); border-color:rgba(49,130,246,.15); }
+  .rate-good .rate-lbl { color:var(--brand); }
+  .rate-good .rate-int { color:rgba(49,130,246,.55); }
+  .rate-good:hover { background:var(--brand); border-color:var(--brand); }
+  .rate-good:hover .rate-lbl,.rate-good:hover .rate-int { color:white; }
+  .rate-easy { background:var(--success-sub); border-color:rgba(0,196,113,.15); }
+  .rate-easy .rate-lbl { color:var(--success); }
+  .rate-easy .rate-int { color:rgba(0,196,113,.55); }
+  .rate-easy:hover { background:var(--success); border-color:var(--success); }
+  .rate-easy:hover .rate-lbl,.rate-easy:hover .rate-int { color:white; }
+
+  /* ===== COMPLETE ===== */
+  #screenComplete { padding:60px 0 80px; }
+  .complete-wrap { text-align:center; padding:0 20px; max-width:480px; margin:0 auto; }
+  .complete-icon { font-size:64px; margin-bottom:20px; display:block; animation:popIn .5s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes popIn { from{transform:scale(0)} to{transform:scale(1)} }
+  .complete-title { font-size:32px; font-weight:900; letter-spacing:-0.04em; margin-bottom:8px; }
+  .complete-sub { font-size:17px; color:var(--text-sub); margin-bottom:36px; }
+  .complete-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:36px; }
+  .cs { background:var(--bg-card); border-radius:var(--radius); padding:20px 12px; box-shadow:var(--shadow); border:1px solid var(--border); text-align:center; }
+  .cs-num { font-size:30px; font-weight:900; letter-spacing:-0.03em; margin-bottom:4px; }
+  .cs-lbl { font-size:11px; color:var(--text-mute); font-weight:600; }
+  .home-btn { display:inline-flex; align-items:center; gap:8px; padding:16px 36px; background:var(--brand); color:white; border:none; border-radius:100px; font-size:16px; font-weight:700; cursor:pointer; font-family:inherit; text-decoration:none; transition:all .15s; }
+  .home-btn:hover { background:#1B64DA; transform:translateY(-2px); }
+
+  /* Toast */
+  .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(100px); background:var(--text); color:white; padding:12px 20px; border-radius:10px; font-size:14px; font-weight:500; z-index:1000; transition:transform .3s cubic-bezier(.22,1,.36,1); box-shadow:0 4px 24px rgba(0,0,0,.15); white-space:nowrap; }
+  .toast.show { transform:translateX(-50%) translateY(0); }
+
+  /* Responsive */
+  @media (max-width:640px) {
+    .stats-grid { grid-template-columns:1fr 1fr; }
+    .stats-grid .stat-card:first-child { grid-column:1/-1; }
+    .mastery-grid { grid-template-columns:1fr; }
+    .rating-btns { grid-template-columns:repeat(2,1fr); }
+    .review-card { padding:24px 20px; }
+    .nav-links > a:not(:last-child) { display:none; }
+    .sess-top { padding:12px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo">산업재산권법 조문연습</a>
+    <div class="nav-links">
+      <a href="study.html">조문 암기</a>
+      <a href="cards.html">커스텀 카드</a>
+      <a href="review.html" class="active">학습 관리</a>
+      <span class="nav-auth"><a href="login.html" class="nav-cta">로그인</a></span>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== LOADING ===== -->
+<div id="screenLoading">
+  <div class="spinner"></div>
+  <span style="font-size:14px">불러오는 중...</span>
+</div>
+
+<!-- ===== DASHBOARD ===== -->
+<div id="screenDash" style="display:none">
+  <div class="container" style="padding-top:48px;padding-bottom:80px">
+    <div class="dash-hero">
+      <h1 id="dashGreet">오늘도 파이팅!</h1>
+      <p id="dashSub">오늘의 학습을 시작해볼까요?</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card hi">
+        <div class="stat-num" id="statDue">-</div>
+        <div class="stat-lbl">오늘 복습할 카드</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statNew">-</div>
+        <div class="stat-lbl">새 카드</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statTotal">-</div>
+        <div class="stat-lbl">전체 카드</div>
+      </div>
+    </div>
+
+    <div class="start-wrap">
+      <button class="start-btn" id="startBtn" disabled>학습 시작하기 →</button>
+    </div>
+
+    <div class="sect">
+      <div class="sect-hd">
+        <span class="sect-title">조문 학습 현황</span>
+        <a href="study.html" class="sect-link">조문 암기 →</a>
+      </div>
+      <div id="lawList"></div>
+    </div>
+
+    <div class="sect">
+      <div class="sect-hd">
+        <span class="sect-title">카드 마스터리</span>
+        <a href="cards.html" class="sect-link">카드 관리 →</a>
+      </div>
+      <div class="mastery-grid" id="masteryGrid">
+        <div class="mastery-empty">카드를 불러오는 중...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SESSION ===== -->
+<div id="screenSession" style="display:none">
+  <div class="sess-top">
+    <button class="exit-btn" id="exitBtn">← 나가기</button>
+    <div class="sess-prog-bar"><div class="sess-prog-fill" id="sessProgFill" style="width:0%"></div></div>
+    <span class="sess-prog-txt" id="sessProgTxt">0 / 0</span>
+  </div>
+  <div class="sess-body">
+    <div class="review-card" id="reviewCard"></div>
+    <div id="revealArea" class="reveal-area"></div>
+    <div id="ratingArea" class="rating-area" style="display:none">
+      <p class="rating-lbl">얼마나 잘 기억했나요?</p>
+      <div class="rating-btns">
+        <button class="rate-btn rate-again" data-grade="0">
+          <span class="rate-lbl">다시</span>
+          <span class="rate-int" id="int0">1일</span>
+        </button>
+        <button class="rate-btn rate-hard" data-grade="1">
+          <span class="rate-lbl">어려움</span>
+          <span class="rate-int" id="int1">-</span>
+        </button>
+        <button class="rate-btn rate-good" data-grade="2">
+          <span class="rate-lbl">보통</span>
+          <span class="rate-int" id="int2">-</span>
+        </button>
+        <button class="rate-btn rate-easy" data-grade="3">
+          <span class="rate-lbl">쉬움</span>
+          <span class="rate-int" id="int3">-</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== COMPLETE ===== -->
+<div id="screenComplete" style="display:none">
+  <div class="complete-wrap" style="padding-top:60px">
+    <span class="complete-icon">🎉</span>
+    <h2 class="complete-title">오늘 학습 완료!</h2>
+    <p class="complete-sub" id="completeSub">수고하셨어요</p>
+    <div class="complete-stats">
+      <div class="cs"><div class="cs-num" id="cReviewed">0</div><div class="cs-lbl">복습 완료</div></div>
+      <div class="cs"><div class="cs-num" id="cAccuracy">-</div><div class="cs-lbl">정확도</div></div>
+      <div class="cs"><div class="cs-num" id="cStreak">0</div><div class="cs-lbl">최장 연속</div></div>
+    </div>
+    <button class="home-btn" onclick="location.reload()">대시보드로 →</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+  import { auth, customCards as cardsAPI, blanks as blanksAPI, cardReviews as reviewsAPI, renderAuthNav } from './supabase-client.js';
+  renderAuthNav();
+
+  // ── SM-2 ──────────────────────────────────────────────────
+  function sm2(rev, grade) {
+    let ef = rev?.ease_factor ?? 2.5;
+    let interval = rev?.interval_days ?? 0;
+    let reps = rev?.repetitions ?? 0;
+
+    if (grade === 0) {
+      reps = 0; interval = 1; ef = Math.max(1.3, ef - 0.2);
+    } else {
+      if (reps === 0) interval = 1;
+      else if (reps === 1) interval = 4;
+      else interval = Math.round(interval * ef);
+      if (grade === 1) { ef = Math.max(1.3, ef - 0.15); interval = Math.max(1, Math.round(interval * 0.75)); }
+      else if (grade === 3) { ef = Math.min(3.5, ef + 0.1); interval = Math.round(interval * 1.3); }
+      reps++;
+    }
+    interval = Math.max(1, interval);
+    const d = new Date(); d.setDate(d.getDate() + interval);
+    return { ease_factor: ef, interval_days: interval, repetitions: reps, due_date: d.toISOString().split('T')[0] };
+  }
+
+  function fmtDays(d) {
+    if (d <= 1) return '1일'; if (d < 7) return d + '일';
+    if (d < 30) return Math.round(d/7) + '주'; return Math.round(d/30) + '개월';
+  }
+  function updateIntPreviews(rev) {
+    [0,1,2,3].forEach(g => {
+      const el = document.getElementById('int' + g);
+      if (el) el.textContent = fmtDays(sm2(rev, g).interval_days);
+    });
+  }
+
+  // ── UTILS ─────────────────────────────────────────────────
+  function esc(s) {
+    if (s == null) return '';
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 1800);
+  }
+  function shuffleArr(arr) {
+    for (let i = arr.length-1; i>0; i--) { const j = Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; }
+    return arr;
+  }
+  function showScreen(name) {
+    ['Loading','Dash','Session','Complete'].forEach(n =>
+      document.getElementById('screen'+n).style.display = n.toLowerCase() === name ? (n==='Session'?'flex':'block') : 'none'
+    );
+    if (name === 'Session') document.getElementById('screenSession').style.display = 'flex';
+  }
+  function getGreeting() {
+    const h = new Date().getHours();
+    if (h < 6) return '늦은 밤에도 열공중이시네요!';
+    if (h < 12) return '좋은 아침이에요!';
+    if (h < 17) return '오늘도 파이팅!';
+    if (h < 21) return '저녁 공부 시작해볼까요?';
+    return '오늘 하루도 수고하셨어요!';
+  }
+
+  // ── STATE ─────────────────────────────────────────────────
+  const today = new Date().toISOString().split('T')[0];
+  const st = {
+    cards: [], reviews: {}, blanks: {},
+    queue: [], queueIdx: 0,
+    failedSet: new Set(),
+    grades: [], streak: 0, maxStreak: 0, reviewed: 0,
+  };
+
+  // ── INIT ──────────────────────────────────────────────────
+  try {
+    const user = await auth.getUser();
+    if (!user) {
+      showScreen('dash');
+      document.getElementById('dashGreet').textContent = '로그인이 필요합니다';
+      document.getElementById('dashSub').textContent = '';
+      const sb = document.getElementById('startBtn');
+      sb.textContent = '로그인하기'; sb.disabled = false;
+      sb.onclick = () => location.href = 'login.html';
+      document.getElementById('statDue').textContent = document.getElementById('statNew').textContent = document.getElementById('statTotal').textContent = '-';
+      renderLawProgress(null);
+      renderMastery([]);
+      return;
+    }
+
+    const [cards, allBlanks, reviews] = await Promise.all([
+      cardsAPI.getAll(), blanksAPI.getAll(), reviewsAPI.getAll(),
+    ]);
+    st.cards = cards; st.blanks = allBlanks;
+    reviews.forEach(r => { st.reviews[r.card_id] = r; });
+
+    // Build queue: due + new (capped 20)
+    const due = [], fresh = [];
+    for (const c of cards) {
+      const r = st.reviews[c.id];
+      if (!r) fresh.push(c);
+      else if (r.due_date <= today) due.push(c);
+    }
+    shuffleArr(fresh);
+    st.queue = [...due, ...fresh.slice(0, 20)];
+
+    document.getElementById('statDue').textContent = due.length;
+    document.getElementById('statNew').textContent = Math.min(fresh.length, 20);
+    document.getElementById('statTotal').textContent = cards.length;
+    document.getElementById('dashGreet').textContent = getGreeting();
+    document.getElementById('dashSub').textContent =
+      st.queue.length > 0 ? `오늘 ${st.queue.length}개의 카드를 복습해요` : '오늘 복습할 카드가 없어요 🎉';
+
+    const sb = document.getElementById('startBtn');
+    if (st.queue.length > 0) { sb.disabled = false; sb.onclick = startSession; }
+    else sb.textContent = '다음 복습까지 기다려요';
+
+    renderLawProgress(allBlanks);
+    renderMastery(cards);
+    showScreen('dash');
+  } catch(e) {
+    console.error(e);
+    showScreen('dash');
+    document.getElementById('dashGreet').textContent = '오류가 발생했습니다';
+    document.getElementById('dashSub').textContent = e.message;
+  }
+
+  // ── LAW PROGRESS ──────────────────────────────────────────
+  async function renderLawProgress(allBlanks) {
+    const container = document.getElementById('lawList');
+    const laws = [
+      { key:'patent',    name:'특허법',      icon:'⚙️', color:'#3182F6', file:'patent.json' },
+      { key:'trademark', name:'상표법',      icon:'™️',  color:'#9B59B6', file:'trademark.json' },
+      { key:'design',    name:'디자인보호법', icon:'🎨', color:'#1ABC9C', file:'design.json' },
+    ];
+
+    if (!allBlanks) {
+      container.innerHTML = '<p style="color:var(--text-mute);font-size:14px;text-align:center;padding:20px">로그인 후 확인하세요</p>';
+      return;
+    }
+
+    container.innerHTML = laws.map(l => {
+      const cnt = Object.keys(allBlanks).filter(k => k.startsWith(l.key + '-')).length;
+      return `
+        <div class="law-card">
+          <div class="law-icon" style="background:${l.color}1A">${l.icon}</div>
+          <div class="law-info">
+            <div class="law-name">${l.name}</div>
+            <div class="law-bar-row">
+              <div class="law-bar"><div class="law-bar-fill" id="bar-${l.key}" style="background:${l.color}"></div></div>
+              <span class="law-pct" id="pct-${l.key}">${cnt}개 학습중</span>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+
+    // Fetch totals async
+    laws.forEach(async l => {
+      try {
+        const res = await fetch(l.file);
+        if (!res.ok) return;
+        const data = await res.json();
+        const total = data.article_count || data.articles?.length || 0;
+        if (!total) return;
+        const cnt = Object.keys(allBlanks).filter(k => k.startsWith(l.key + '-')).length;
+        const pct = Math.round(cnt / total * 100);
+        const barEl = document.getElementById('bar-' + l.key);
+        const pctEl = document.getElementById('pct-' + l.key);
+        if (barEl) requestAnimationFrame(() => { barEl.style.width = pct + '%'; });
+        if (pctEl) pctEl.textContent = `${pct}%  (${cnt} / ${total})`;
+      } catch {}
+    });
+  }
+
+  // ── MASTERY GRID ──────────────────────────────────────────
+  function renderMastery(cards) {
+    const grid = document.getElementById('masteryGrid');
+    if (!cards.length) {
+      grid.innerHTML = `<div class="mastery-empty">카드가 없습니다.<br><a href="cards.html" style="color:var(--brand);font-weight:600">카드 만들기 →</a></div>`;
+      return;
+    }
+    const show = cards.slice(0, 12);
+    const R = 18, CIRC = 2 * Math.PI * R;
+
+    grid.innerHTML = show.map(card => {
+      const rev = st.reviews[card.id];
+      const interval = rev?.interval_days ?? 0;
+      const color = !rev ? '#8B95A1' : interval >= 30 ? '#00C471' : interval >= 7 ? '#3182F6' : '#F59E0B';
+      const fillPct = Math.min(interval / 30, 1);
+      const offset = CIRC - fillPct * CIRC;
+      const sub = !rev ? '미학습' : interval >= 30 ? `마스터 · ${interval}일 후 복습` : interval >= 7 ? `익숙해짐 · ${interval}일 후` : `학습중 · ${rev.repetitions}회`;
+      return `
+        <div class="mastery-item">
+          <svg width="44" height="44" class="ring-svg">
+            <circle class="ring-track" cx="22" cy="22" r="${R}" stroke-width="4"/>
+            <circle class="ring-fill" cx="22" cy="22" r="${R}" stroke-width="4" stroke="${color}"
+              stroke-dasharray="${CIRC.toFixed(1)}" stroke-dashoffset="${offset.toFixed(1)}"/>
+          </svg>
+          <div class="mastery-info">
+            <div class="mastery-title">${esc(card.title)}</div>
+            <div class="mastery-sub">${sub}</div>
+          </div>
+        </div>`;
+    }).join('');
+
+    if (cards.length > 12) {
+      grid.innerHTML += `<div class="mastery-empty" style="grid-column:1/-1;font-size:13px">외 ${cards.length - 12}개 카드</div>`;
+    }
+  }
+
+  // ── SESSION ───────────────────────────────────────────────
+  function startSession() {
+    st.queueIdx = 0; st.grades = []; st.streak = 0; st.maxStreak = 0; st.reviewed = 0; st.failedSet.clear();
+    showScreen('session');
+    showCurrentCard();
+  }
+
+  document.getElementById('exitBtn').onclick = () => {
+    if (st.reviewed > 0 && !confirm(`${st.reviewed}개를 학습했습니다. 지금 나가시겠습니까?`)) return;
+    showScreen('dash');
+  };
+
+  function updateProgress() {
+    const total = st.queue.length, done = st.queueIdx;
+    document.getElementById('sessProgFill').style.width = total > 0 ? (done/total*100)+'%' : '0%';
+    document.getElementById('sessProgTxt').textContent = `${done} / ${total}`;
+  }
+
+  function showCurrentCard() {
+    if (st.queueIdx >= st.queue.length) { showComplete(); return; }
+    updateProgress();
+    const card = st.queue[st.queueIdx];
+    renderCard(card, st.reviews[card.id] ?? null, false);
+  }
+
+  function renderCard(card, rev, revealed) {
+    const cardEl = document.getElementById('reviewCard');
+    const revealEl = document.getElementById('revealArea');
+    const ratingEl = document.getElementById('ratingArea');
+
+    const ct = card.card_type || 'fill-blank';
+    const bk = 'custom-' + card.id;
+    const cardBlanks = st.blanks[bk] || [];
+
+    // Build card content
+    const typeLabel = ct==='ox' ? '<span class="type-badge" style="background:#FFF0E0;color:#D4620A">O/X</span>'
+      : ct==='subjective' ? '<span class="type-badge" style="background:#F0E8FF;color:#7B4FBD">주관식</span>'
+      : ct==='table' ? '<span class="type-badge" style="background:#E0F5EE;color:#1A8C6F">표</span>' : '';
+
+    let body = '';
+    if (ct === 'fill-blank') body = buildFillBlank(card.body, cardBlanks, revealed);
+    else if (ct === 'ox')    body = buildOX(card, revealed);
+    else if (ct === 'subjective') body = buildSubj(card, revealed);
+    else if (ct === 'table') body = buildTable(card.body, cardBlanks, revealed);
+
+    cardEl.innerHTML = `
+      <div class="card-meta"><span class="cat-badge">${esc(card.category)}</span>${typeLabel}</div>
+      <div class="card-title">${esc(card.title)}</div>
+      ${body}`;
+    cardEl.style.animation = 'none';
+    requestAnimationFrame(() => { cardEl.style.animation = ''; });
+
+    if (ct === 'ox') {
+      revealEl.innerHTML = '';
+      ratingEl.style.display = 'none';
+      setupOX(card, rev);
+    } else {
+      if (!revealed) {
+        revealEl.innerHTML = `<button class="reveal-btn" id="revealBtn">정답 확인</button>`;
+        document.getElementById('revealBtn').onclick = () => renderCard(card, rev, true);
+        ratingEl.style.display = 'none';
+      } else {
+        revealEl.innerHTML = '';
+        ratingEl.style.display = 'block';
+        updateIntPreviews(rev);
+        ratingEl.querySelectorAll('.rate-btn').forEach(btn => {
+          btn.onclick = () => submitGrade(card, +btn.dataset.grade, rev);
+        });
+      }
+    }
+  }
+
+  function buildFillBlank(body, blanks, revealed) {
+    if (!blanks.length) return `<div class="card-body">${esc(body)}</div>`;
+    const sorted = [...blanks].filter(b=>!b.isText).sort((a,b)=>a.start-b.start);
+    if (!sorted.length) return `<div class="card-body">${esc(body)}</div>`;
+    let html = '<div class="card-body">', cur = 0;
+    sorted.forEach(b => {
+      html += esc(body.slice(cur, b.start));
+      html += `<span class="rv-blank ${revealed?'rev':'hid'}">${esc(b.text)}</span>`;
+      cur = b.end;
+    });
+    return html + esc(body.slice(cur)) + '</div>';
+  }
+
+  function buildOX(card, revealed) {
+    let d = {}; try { d = JSON.parse(card.body); } catch {}
+    return `<div class="card-body">${esc(d.q || card.body)}</div>`;
+  }
+
+  function buildSubj(card, revealed) {
+    let d = {}; try { d = JSON.parse(card.body); } catch {}
+    let html = `<div class="card-body">${esc(d.q || card.body)}</div>`;
+    if (!revealed) html += `<textarea class="rv-subj-input" placeholder="답변을 입력해보세요... (선택)"></textarea>`;
+    else html += `<div class="rv-model-answer">${esc(d.a || '')}</div>`;
+    return html;
+  }
+
+  function buildTable(body, blanks, revealed) {
+    let td; try { const p=JSON.parse(body); if(p&&Array.isArray(p.rows)) td=p; } catch {}
+    if (!td) td = {rows: body.trim().split('\n').filter(r=>r.trim()).map(r=>r.split('|').map(c=>({t:c.trim(),r:1,c:1})))};
+    if (!td.rows.length) return '<p style="color:var(--text-mute)">표 데이터 없음</p>';
+
+    const isCellBlank = (ri,ci) => blanks.some(b=>b.row===ri&&b.col===ci&&!b.isText);
+    const getTxtBlanks = (ri,ci) => blanks.filter(b=>b.row===ri&&b.col===ci&&b.isText).sort((a,b)=>a.start-b.start);
+
+    const buildCellHtml = (cell, ri, ci) => {
+      if (!cell) return '';
+      const tag = ri===0?'th':'td', rs=cell.r>1?` rowspan="${cell.r}"`:'', cs=cell.c>1?` colspan="${cell.c}"` :'';
+      const cb = isCellBlank(ri,ci), tb = getTxtBlanks(ri,ci);
+      let cls='', disp='';
+      if (cb) {
+        cls = revealed ? 'rv-cell-reveal' : 'rv-cell-blank'; disp = revealed ? esc(cell.t) : '';
+      } else if (tb.length && !revealed) {
+        let h='', cur=0;
+        tb.forEach(b=>{ h+=esc(cell.t.slice(cur,b.start)); h+=`<span class="rv-txt-blank">${esc(b.text)}</span>`; cur=b.end; });
+        disp = h + esc(cell.t.slice(cur));
+      } else if (tb.length && revealed) {
+        let h='', cur=0;
+        tb.forEach(b=>{ h+=esc(cell.t.slice(cur,b.start)); h+=`<span class="rv-txt-reveal">${esc(b.text)}</span>`; cur=b.end; });
+        disp = h + esc(cell.t.slice(cur));
+      } else { disp = esc(cell.t); }
+      return `<${tag}${rs}${cs} class="${cls}">${disp}</${tag}>`;
+    };
+
+    const [hdr,...rows] = td.rows;
+    let html = '<div style="overflow-x:auto"><table class="rv-table"><thead><tr>';
+    hdr.forEach((c,ci)=>{ html+=buildCellHtml(c,0,ci); });
+    html += '</tr></thead><tbody>';
+    rows.forEach((row,ri)=>{ html+='<tr>'; row.forEach((c,ci)=>{ html+=buildCellHtml(c,ri+1,ci); }); html+='</tr>'; });
+    return html + '</tbody></table></div>';
+  }
+
+  function setupOX(card, rev) {
+    let d = {}; try { d = JSON.parse(card.body); } catch {}
+    const revealEl = document.getElementById('revealArea');
+    const ratingEl = document.getElementById('ratingArea');
+    revealEl.innerHTML = `
+      <div class="ox-btns">
+        <button class="ox-btn ox-o" id="btnO">O</button>
+        <button class="ox-btn ox-x" id="btnX">X</button>
+      </div>`;
+    ratingEl.style.display = 'none';
+
+    const handle = (chosen) => {
+      const correct = chosen === d.a;
+      const bo = document.getElementById('btnO'), bx = document.getElementById('btnX');
+      bo.disabled = bx.disabled = true;
+      if (d.a==='O') bo.classList.add('ox-correct'); else bo.classList.add('ox-wrong');
+      if (d.a==='X') bx.classList.add('ox-correct'); else bx.classList.add('ox-wrong');
+      revealEl.innerHTML += `
+        <div class="rv-result">
+          <span class="rv-result-badge ${correct?'rv-correct':'rv-wrong'}">${correct?'✓ 정답!':'✗ 오답'}</span>
+          ${d.e ? `<div class="rv-expl"><strong>해설:</strong> ${esc(d.e)}</div>` : ''}
+        </div>`;
+      ratingEl.style.display = 'block';
+      updateIntPreviews(rev);
+      ratingEl.querySelectorAll('.rate-btn').forEach(btn => {
+        btn.onclick = () => submitGrade(card, +btn.dataset.grade, rev);
+      });
+    };
+    document.getElementById('btnO').onclick = () => handle('O');
+    document.getElementById('btnX').onclick = () => handle('X');
+  }
+
+  async function submitGrade(card, grade, rev) {
+    const next = sm2(rev, grade);
+    st.reviews[card.id] = { ...rev, ...next, card_id: card.id };
+    st.grades.push(grade >= 2 ? 1 : 0);
+    if (grade >= 2) { st.streak++; st.maxStreak = Math.max(st.maxStreak, st.streak); }
+    else {
+      st.streak = 0;
+      // '다시' → 1번만 큐 뒤에 다시 추가
+      if (!st.failedSet.has(card.id)) { st.failedSet.add(card.id); st.queue.push(card); }
+    }
+    st.reviewed++; st.queueIdx++;
+    reviewsAPI.save(card.id, next).catch(e => console.warn('저장 실패:', e));
+    showCurrentCard();
+  }
+
+  function showComplete() {
+    const correct = st.grades.filter(g=>g===1).length;
+    const acc = st.reviewed > 0 ? Math.round(correct/st.reviewed*100) : 0;
+    document.getElementById('cReviewed').textContent = st.reviewed;
+    document.getElementById('cAccuracy').textContent = acc + '%';
+    document.getElementById('cStreak').textContent = st.maxStreak;
+    document.getElementById('completeSub').textContent =
+      acc >= 90 ? '완벽해요! 🎯' : acc >= 70 ? '잘 하셨어요!' : '계속 복습하면 늘어요 💪';
+    showScreen('complete');
+  }
+</script>
+</body>
+</html>

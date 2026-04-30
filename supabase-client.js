@@ -261,6 +261,38 @@ export const customCards = {
 };
 
 // ============================================================
+// 복습 주기 (SM-2) 유틸
+// ============================================================
+export const cardReviews = {
+  async getAll() {
+    const user = await auth.getUser();
+    if (!user) return [];
+    const { data, error } = await supabase
+      .from('card_reviews')
+      .select('*')
+      .eq('user_id', user.id);
+    if (error) { console.warn('리뷰 데이터 조회 실패:', error.message); return []; }
+    return data || [];
+  },
+  async save(cardId, next) {
+    const user = await auth.getUser();
+    if (!user) return { error: new Error('로그인이 필요합니다') };
+    const { error } = await supabase
+      .from('card_reviews')
+      .upsert({
+        user_id: user.id,
+        card_id: cardId,
+        ease_factor: next.ease_factor,
+        interval_days: next.interval_days,
+        repetitions: next.repetitions,
+        due_date: next.due_date,
+        last_reviewed_at: new Date().toISOString(),
+      }, { onConflict: 'user_id,card_id' });
+    return { error };
+  },
+};
+
+// ============================================================
 // 카드 폴더 유틸
 // ============================================================
 export const cardFolders = {
