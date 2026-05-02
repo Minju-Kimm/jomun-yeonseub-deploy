@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>관리자 패널 | 산업재산권법 조문연습</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F9FAFB; --bg-card: #FFFFFF; --text: #191F28; --text-sub: #4E5968;
+    --text-mute: #8B95A1; --border: #F2F4F6; --border-strong: #E5E8EB;
+    --brand: #3182F6; --brand-sub: #E8F3FF; --brand-hover: #1B64DA;
+    --accent: #FFF3CD; --accent-strong: #F4A100;
+    --success: #00C471; --success-sub: #E6F9F0;
+    --danger: #F04452; --danger-sub: #FFEBED;
+    --radius: 14px; --radius-lg: 20px; --nav-h: 56px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Pretendard', -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; -webkit-font-smoothing: antialiased; letter-spacing: -0.01em; }
+
+  nav { position: sticky; top: 0; background: rgba(249,250,251,0.92); backdrop-filter: saturate(180%) blur(16px); z-index: 100; border-bottom: 1px solid var(--border); }
+  .nav-inner { display: flex; align-items: center; justify-content: space-between; height: var(--nav-h); max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+  .logo { font-size: 17px; font-weight: 800; color: var(--text); text-decoration: none; letter-spacing: -0.03em; }
+  .nav-links { display: flex; gap: 24px; align-items: center; }
+  .nav-links a { color: var(--text-sub); text-decoration: none; font-size: 15px; font-weight: 500; }
+  .nav-badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; background: var(--danger); color: white; margin-left: 4px; }
+
+  .admin-header { max-width: 1280px; margin: 0 auto; padding: 24px 24px 0; }
+  .admin-header h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.03em; }
+  .admin-header p { font-size: 14px; color: var(--text-mute); margin-top: 4px; }
+
+  .layout { display: grid; grid-template-columns: 300px 1fr; max-width: 1280px; margin: 0 auto; min-height: calc(100vh - var(--nav-h) - 70px); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-top: 20px; margin-bottom: 40px; }
+
+  aside { border-right: 1px solid var(--border); display: flex; flex-direction: column; background: var(--bg-card); }
+  .law-tabs { display: flex; gap: 4px; padding: 14px 14px 12px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  .law-tab { flex: 1; padding: 8px 4px; font-size: 13px; font-weight: 600; background: transparent; border: none; color: var(--text-mute); cursor: pointer; border-radius: 8px; transition: all 0.15s; font-family: inherit; }
+  .law-tab.active { background: var(--text); color: white; }
+  .law-tab:not(.active):hover { background: var(--border); color: var(--text); }
+
+  .sidebar-search { padding: 10px 14px 8px; flex-shrink: 0; }
+  .sidebar-search input { width: 100%; padding: 9px 12px; border: 1px solid var(--border-strong); border-radius: 9px; font-size: 13px; font-family: inherit; background: var(--bg); color: var(--text); outline: none; transition: border-color 0.15s; }
+  .sidebar-search input:focus { border-color: var(--brand); }
+
+  .add-article-btn { margin: 0 14px 10px; padding: 10px 16px; background: var(--brand); color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; transition: background 0.15s; flex-shrink: 0; }
+  .add-article-btn:hover { background: var(--brand-hover); }
+
+  .article-list { list-style: none; flex: 1; overflow-y: auto; padding: 4px 8px 24px; }
+  .chapter-header { padding: 14px 10px 6px; font-size: 11px; font-weight: 700; color: var(--text-mute); text-transform: uppercase; letter-spacing: 0.06em; }
+  .article-item { display: flex; align-items: center; gap: 6px; padding: 9px 10px; border-radius: 8px; cursor: pointer; transition: background 0.1s; font-size: 13px; }
+  .article-item:hover { background: var(--border); }
+  .article-item.active { background: var(--brand-sub); color: var(--brand); font-weight: 600; }
+  .article-num { font-size: 12px; font-weight: 700; color: var(--text-mute); flex-shrink: 0; }
+  .article-item.active .article-num { color: var(--brand); }
+  .article-title-sm { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .override-badge { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: var(--accent); color: var(--accent-strong); flex-shrink: 0; }
+  .new-badge { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: var(--success-sub); color: var(--success); flex-shrink: 0; }
+  .article-list::-webkit-scrollbar { width: 4px; }
+  .article-list::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
+
+  main { padding: 32px 40px; background: var(--bg-card); }
+
+  .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; text-align: center; gap: 8px; color: var(--text-mute); }
+  .empty-state h3 { font-size: 18px; font-weight: 700; color: var(--text-sub); }
+
+  .admin-form { max-width: 720px; }
+  .admin-form-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
+  .admin-form-header h2 { font-size: 22px; font-weight: 800; letter-spacing: -0.03em; }
+  .form-group { margin-bottom: 20px; }
+  .form-label { display: block; font-size: 13px; font-weight: 600; color: var(--text-sub); margin-bottom: 8px; }
+  .form-input { width: 100%; padding: 12px 14px; border: 1px solid var(--border-strong); border-radius: 10px; font-size: 15px; font-family: inherit; background: var(--bg-card); color: var(--text); outline: none; transition: border-color 0.15s; }
+  .form-input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(49,130,246,0.1); }
+  .form-select { width: auto; padding: 10px 14px; border: 1px solid var(--border-strong); border-radius: 10px; font-size: 14px; font-family: inherit; background: var(--bg-card); color: var(--text); outline: none; cursor: pointer; }
+  .form-select:focus { border-color: var(--brand); }
+  .form-textarea { width: 100%; min-height: 400px; padding: 14px 16px; border: 1px solid var(--border-strong); border-radius: 10px; font-size: 17px; font-family: 'Gowun Batang', serif; background: var(--bg-card); color: var(--text); outline: none; resize: vertical; line-height: 2; transition: border-color 0.15s; }
+  .form-textarea:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(49,130,246,0.1); }
+  .form-hint { margin-top: 6px; font-size: 12px; color: var(--text-mute); }
+  .form-actions { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+  .tool-btn { padding: 10px 18px; font-size: 14px; font-weight: 600; background: white; border: 1px solid var(--border-strong); border-radius: 10px; cursor: pointer; color: var(--text); font-family: inherit; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s; }
+  .tool-btn:hover:not(:disabled) { border-color: var(--text-mute); }
+  .tool-btn.primary { background: var(--brand); color: white; border-color: var(--brand); }
+  .tool-btn.primary:hover { background: var(--brand-hover); border-color: var(--brand-hover); }
+  .tool-btn.danger:hover { color: var(--danger); border-color: var(--danger); }
+
+  .original-preview { background: var(--bg); border: 1px solid var(--border-strong); border-radius: 10px; padding: 16px 20px; margin-bottom: 20px; }
+  .original-preview-label { font-size: 11px; font-weight: 700; color: var(--text-mute); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+  .original-preview-text { font-family: 'Gowun Batang', serif; font-size: 15px; line-height: 1.9; color: var(--text-sub); white-space: pre-wrap; max-height: 200px; overflow-y: auto; }
+
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--text); color: white; padding: 12px 20px; border-radius: 10px; font-size: 14px; font-weight: 500; z-index: 1000; transition: transform 0.3s cubic-bezier(0.22,1,0.36,1); box-shadow: 0 4px 24px rgba(0,0,0,0.15); }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  #accessDenied { max-width: 480px; margin: 100px auto; text-align: center; padding: 48px 32px; background: var(--bg-card); border-radius: var(--radius-lg); box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
+  #accessDenied h2 { font-size: 24px; font-weight: 800; margin-bottom: 12px; }
+  #accessDenied p { font-size: 15px; color: var(--text-sub); margin-bottom: 24px; line-height: 1.7; }
+  #accessDenied a { display: inline-block; padding: 12px 28px; background: var(--brand); color: white; text-decoration: none; border-radius: 10px; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo">산업재산권법 조문연습</a>
+    <div class="nav-links">
+      <a href="study.html">조문 암기</a>
+      <a href="cards.html">커스텀 카드</a>
+      <span class="nav-auth"><a href="login.html">로그인</a></span>
+    </div>
+  </div>
+</nav>
+
+<div id="accessDenied" style="display:none">
+  <h2>접근 권한 없음</h2>
+  <p>이 페이지는 관리자 전용입니다.<br>관리자 계정으로 로그인해주세요.</p>
+  <a href="login.html">로그인하기 →</a>
+</div>
+
+<div id="adminRoot" style="display:none">
+  <div class="admin-header">
+    <h1>조문 관리자 패널 <span class="nav-badge">ADMIN</span></h1>
+    <p>조문 내용을 수정하거나 새 조문을 추가합니다. 변경사항은 모든 사용자에게 즉시 반영됩니다.</p>
+  </div>
+
+  <div style="max-width:1280px;margin:0 auto;padding:0 24px;">
+    <div class="layout">
+      <aside>
+        <div class="law-tabs">
+          <button class="law-tab active" data-law="patent">특허법</button>
+          <button class="law-tab" data-law="trademark">상표법</button>
+          <button class="law-tab" data-law="design">디자인</button>
+        </div>
+        <div class="sidebar-search">
+          <input type="text" id="searchInput" placeholder="조문 번호·제목 검색">
+        </div>
+        <button class="add-article-btn" id="addArticleBtn">+ 새 조문 추가</button>
+        <ul class="article-list" id="articleList">
+          <li style="padding:16px;color:var(--text-mute);font-size:13px">불러오는 중...</li>
+        </ul>
+      </aside>
+      <main id="mainArea">
+        <div class="empty-state">
+          <h3>조문을 선택하세요</h3>
+          <p>왼쪽 목록에서 조문을 선택하거나 새 조문을 추가하세요.</p>
+        </div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+  import { auth, articleOverrides as overridesAPI, renderAuthNav } from './supabase-client.js';
+
+  renderAuthNav();
+
+  const ADMIN_EMAIL = 'alswn299842@ewhain.net';
+
+  // ─── 권한 확인 ───
+  const user = await auth.getUser();
+  if (!user || user.email !== ADMIN_EMAIL) {
+    document.getElementById('accessDenied').style.display = 'block';
+    // Stop execution
+    throw new Error('Not admin');
+  }
+
+  document.getElementById('adminRoot').style.display = 'block';
+
+  const state = {
+    currentLaw: 'patent',
+    articles: {},
+    overrides: {}, // article_id → override row
+    selectedId: null,
+  };
+
+  // ─── 오버라이드 로드 ───
+  const overridesList = await overridesAPI.getAll().catch(() => []);
+  for (const o of overridesList) state.overrides[o.article_id] = o;
+
+  // ─── 법령 탭 ───
+  document.querySelectorAll('.law-tab').forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll('.law-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.selectedId = null;
+      loadLaw(btn.dataset.law);
+      document.getElementById('mainArea').innerHTML = `
+        <div class="empty-state"><h3>조문을 선택하세요</h3><p>왼쪽 목록에서 선택하거나 새 조문을 추가하세요.</p></div>
+      `;
+    };
+  });
+
+  // ─── 검색 ───
+  let searchTimer;
+  document.getElementById('searchInput').oninput = (e) => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => renderList(e.target.value), 120);
+  };
+
+  // ─── 새 조문 추가 버튼 ───
+  document.getElementById('addArticleBtn').onclick = showNewArticleForm;
+
+  // ─── 초기 로드 ───
+  await loadLaw('patent');
+
+  async function loadLaw(slug) {
+    state.currentLaw = slug;
+    if (!state.articles[slug]) {
+      try {
+        const res = await fetch(`${slug}.json`);
+        const data = await res.json();
+        state.articles[slug] = data.articles;
+      } catch {
+        toast('조문 불러오기 실패');
+        return;
+      }
+    }
+    renderList();
+  }
+
+  function renderList(filter = '') {
+    const list = document.getElementById('articleList');
+    const articles = state.articles[state.currentLaw] || [];
+    const kw = filter.toLowerCase().trim();
+    let html = '';
+    let lastChapter = null;
+
+    for (const art of articles) {
+      if (kw) {
+        const hay = `${art.number} ${art.title}`.toLowerCase();
+        if (!hay.includes(kw)) continue;
+      }
+      if (art.chapter && art.chapter !== lastChapter) {
+        html += `<li class="chapter-header">${escapeHtml(art.chapter)}</li>`;
+        lastChapter = art.chapter;
+      }
+      const hasOverride = !!state.overrides[art.id];
+      const isActive = art.id === state.selectedId;
+      html += `
+        <li class="article-item ${isActive ? 'active' : ''}" data-id="${art.id}">
+          <span class="article-num">${escapeHtml(art.number)}</span>
+          <span class="article-title-sm">${escapeHtml(art.title)}</span>
+          ${hasOverride ? '<span class="override-badge">수정</span>' : ''}
+        </li>`;
+    }
+
+    // 신규 조문 (overrides에서 is_new인 것)
+    const newArticles = Object.values(state.overrides)
+      .filter(o => o.is_new && o.law_slug === state.currentLaw);
+    for (const art of newArticles) {
+      if (kw) {
+        const hay = `${art.number} ${art.title}`.toLowerCase();
+        if (!hay.includes(kw)) continue;
+      }
+      const isActive = art.article_id === state.selectedId;
+      html += `
+        <li class="article-item ${isActive ? 'active' : ''}" data-id="${art.article_id}" style="color:var(--success)">
+          <span class="article-num" style="color:var(--success)">${escapeHtml(art.number)}</span>
+          <span class="article-title-sm">${escapeHtml(art.title)}</span>
+          <span class="new-badge">신규</span>
+        </li>`;
+    }
+
+    if (!html) html = '<li style="padding:16px;color:var(--text-mute);font-size:13px">검색 결과 없음</li>';
+    list.innerHTML = html;
+
+    list.querySelectorAll('.article-item[data-id]').forEach(el => {
+      el.onclick = () => selectArticle(el.dataset.id);
+    });
+  }
+
+  function selectArticle(id) {
+    state.selectedId = id;
+    renderList(document.getElementById('searchInput').value);
+    renderEditForm(id);
+  }
+
+  function renderEditForm(id) {
+    // 기본 조문 찾기
+    let baseArt = null;
+    for (const slug of Object.keys(state.articles)) {
+      baseArt = state.articles[slug].find(a => a.id === id);
+      if (baseArt) break;
+    }
+
+    const override = state.overrides[id];
+
+    // is_new 조문이면 override에서만 존재
+    if (!baseArt && !override) return;
+
+    // 신규 조문인 경우
+    if (!baseArt && override?.is_new) {
+      renderNewArticleEditForm(override);
+      return;
+    }
+
+    const displayArt = { ...baseArt, ...(override || {}) };
+    const mainArea = document.getElementById('mainArea');
+
+    mainArea.innerHTML = `
+      <div class="admin-form">
+        <div class="admin-form-header">
+          <div>
+            <h2>${escapeHtml(baseArt.number)} ${escapeHtml(baseArt.title)}</h2>
+            <div style="font-size:13px;color:var(--text-mute);margin-top:4px;">${escapeHtml(baseArt.id)}</div>
+          </div>
+          ${override ? `<button class="tool-btn danger" onclick="deleteOverride('${id}')">수정 초기화</button>` : ''}
+        </div>
+
+        ${override ? '' : `
+          <div class="original-preview">
+            <div class="original-preview-label">현재 원본 내용 (참고용)</div>
+            <div class="original-preview-text">${escapeHtml(baseArt.body)}</div>
+          </div>
+        `}
+
+        <div class="form-group">
+          <label class="form-label">조문 번호</label>
+          <input class="form-input" id="editNumber" value="${escapeHtml(displayArt.number || '')}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">제목</label>
+          <input class="form-input" id="editTitle" value="${escapeHtml(displayArt.title || '')}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">장 <span style="font-weight:400;color:var(--text-mute)">(선택)</span></label>
+          <input class="form-input" id="editChapter" value="${escapeHtml(displayArt.chapter || '')}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">본문</label>
+          <textarea class="form-textarea" id="editBody">${escapeHtml(displayArt.body || '')}</textarea>
+          <div class="form-hint">조문 원문 그대로 입력하세요. 항·호 번호, 괄호 포함.</div>
+        </div>
+
+        <div class="form-actions">
+          <button class="tool-btn primary" onclick="saveOverride('${id}')">저장하기 →</button>
+          <button class="tool-btn" onclick="cancelEdit()">취소</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderNewArticleEditForm(override) {
+    const mainArea = document.getElementById('mainArea');
+    mainArea.innerHTML = `
+      <div class="admin-form">
+        <div class="admin-form-header">
+          <div>
+            <h2>${escapeHtml(override.number)} ${escapeHtml(override.title)} <span style="font-size:14px;color:var(--success);font-weight:600">[신규 조문]</span></h2>
+            <div style="font-size:13px;color:var(--text-mute);margin-top:4px;">${escapeHtml(override.article_id)}</div>
+          </div>
+          <button class="tool-btn danger" onclick="deleteOverride('${override.article_id}')">신규 조문 삭제</button>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">조문 번호</label>
+          <input class="form-input" id="editNumber" value="${escapeHtml(override.number || '')}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">제목</label>
+          <input class="form-input" id="editTitle" value="${escapeHtml(override.title || '')}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">장 <span style="font-weight:400;color:var(--text-mute)">(선택)</span></label>
+          <input class="form-input" id="editChapter" value="${escapeHtml(override.chapter || '')}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">본문</label>
+          <textarea class="form-textarea" id="editBody">${escapeHtml(override.body || '')}</textarea>
+        </div>
+
+        <div class="form-actions">
+          <button class="tool-btn primary" onclick="saveOverride('${override.article_id}', true)">저장하기 →</button>
+          <button class="tool-btn" onclick="cancelEdit()">취소</button>
+        </div>
+      </div>
+    `;
+  }
+
+  window.saveOverride = async function(articleId, isNew = false) {
+    const number  = document.getElementById('editNumber')?.value.trim() || '';
+    const title   = document.getElementById('editTitle')?.value.trim() || '';
+    const chapter = document.getElementById('editChapter')?.value.trim() || '';
+    const body    = document.getElementById('editBody')?.value.trim() || '';
+
+    if (!title || !body) { toast('제목과 본문을 입력해주세요'); return; }
+
+    const { error } = await overridesAPI.upsert({
+      article_id: articleId,
+      law_slug: state.currentLaw,
+      number,
+      title,
+      chapter: chapter || null,
+      body,
+      is_new: isNew,
+    });
+    if (error) { toast('저장 실패: ' + error.message); return; }
+
+    state.overrides[articleId] = {
+      article_id: articleId, law_slug: state.currentLaw,
+      number, title, chapter: chapter || null, body, is_new: isNew,
+    };
+
+    // 캐시 초기화 (변경된 법령 다시 로드 시 오버라이드 반영)
+    delete state.articles[state.currentLaw];
+    renderList(document.getElementById('searchInput').value);
+    toast('저장되었습니다');
+  };
+
+  window.deleteOverride = async function(articleId) {
+    const isNew = state.overrides[articleId]?.is_new;
+    const msg = isNew ? '이 신규 조문을 삭제할까요?' : '이 조문의 수정 내역을 삭제하고 원본으로 되돌릴까요?';
+    if (!confirm(msg)) return;
+
+    const { error } = await overridesAPI.remove(articleId);
+    if (error) { toast('삭제 실패: ' + error.message); return; }
+
+    delete state.overrides[articleId];
+    delete state.articles[state.currentLaw]; // 캐시 초기화
+    state.selectedId = null;
+    renderList(document.getElementById('searchInput').value);
+    document.getElementById('mainArea').innerHTML = `
+      <div class="empty-state"><h3>삭제 완료</h3><p>수정 내역이 삭제되었습니다.</p></div>
+    `;
+    toast(isNew ? '신규 조문이 삭제되었습니다' : '수정 내역이 초기화되었습니다');
+  };
+
+  window.cancelEdit = function() {
+    state.selectedId = null;
+    renderList(document.getElementById('searchInput').value);
+    document.getElementById('mainArea').innerHTML = `
+      <div class="empty-state"><h3>조문을 선택하세요</h3><p>왼쪽 목록에서 조문을 선택하거나 새 조문을 추가하세요.</p></div>
+    `;
+  };
+
+  function showNewArticleForm() {
+    state.selectedId = null;
+    renderList(document.getElementById('searchInput').value);
+
+    const lawNames = { patent: '특허법', trademark: '상표법', design: '디자인보호법' };
+    const lawOptions = Object.entries(lawNames).map(([v, l]) =>
+      `<option value="${v}" ${v === state.currentLaw ? 'selected' : ''}>${l}</option>`
+    ).join('');
+
+    document.getElementById('mainArea').innerHTML = `
+      <div class="admin-form">
+        <div class="admin-form-header">
+          <h2>새 조문 추가</h2>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">법령</label>
+          <select class="form-select" id="newLawSlug">${lawOptions}</select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">조문 ID</label>
+          <input class="form-input" id="newArticleId" placeholder="예: patent-200">
+          <div class="form-hint">법령명-숫자 형식의 고유 ID. 기존 ID와 겹치지 않게 입력하세요.</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">조문 번호</label>
+          <input class="form-input" id="newNumber" placeholder="예: 제200조">
+        </div>
+        <div class="form-group">
+          <label class="form-label">제목</label>
+          <input class="form-input" id="newTitle" placeholder="예: 특허권의 효력">
+        </div>
+        <div class="form-group">
+          <label class="form-label">장 <span style="font-weight:400;color:var(--text-mute)">(선택)</span></label>
+          <input class="form-input" id="newChapter" placeholder="예: 제3장 특허권">
+        </div>
+        <div class="form-group">
+          <label class="form-label">본문</label>
+          <textarea class="form-textarea" id="newBody" placeholder="조문 원문을 입력하세요."></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button class="tool-btn primary" onclick="saveNewArticle()">추가하기 →</button>
+          <button class="tool-btn" onclick="cancelEdit()">취소</button>
+        </div>
+      </div>
+    `;
+  }
+
+  window.saveNewArticle = async function() {
+    const lawSlug   = document.getElementById('newLawSlug')?.value || state.currentLaw;
+    const articleId = document.getElementById('newArticleId')?.value.trim();
+    const number    = document.getElementById('newNumber')?.value.trim();
+    const title     = document.getElementById('newTitle')?.value.trim();
+    const chapter   = document.getElementById('newChapter')?.value.trim();
+    const body      = document.getElementById('newBody')?.value.trim();
+
+    if (!articleId || !number || !title || !body) {
+      toast('ID, 번호, 제목, 본문을 모두 입력해주세요'); return;
+    }
+    if (state.overrides[articleId]) {
+      toast('이미 존재하는 조문 ID입니다'); return;
+    }
+    const existsInJson = Object.values(state.articles).flat().some(a => a.id === articleId);
+    if (existsInJson) {
+      toast('이미 존재하는 조문 ID입니다. 해당 조문을 선택해 수정하세요.'); return;
+    }
+
+    const { error } = await overridesAPI.upsert({
+      article_id: articleId,
+      law_slug: lawSlug,
+      number, title,
+      chapter: chapter || null,
+      body, is_new: true,
+    });
+    if (error) { toast('추가 실패: ' + error.message); return; }
+
+    state.overrides[articleId] = {
+      article_id: articleId, law_slug: lawSlug,
+      number, title, chapter: chapter || null, body, is_new: true,
+    };
+    state.currentLaw = lawSlug;
+    document.querySelectorAll('.law-tab').forEach(b => b.classList.toggle('active', b.dataset.law === lawSlug));
+    delete state.articles[lawSlug];
+    state.selectedId = articleId;
+    await loadLaw(lawSlug);
+    renderList(document.getElementById('searchInput').value);
+    renderNewArticleEditForm(state.overrides[articleId]);
+    toast('새 조문이 추가되었습니다');
+  };
+
+  // ─── 유틸 ───
+  function escapeHtml(s) {
+    if (s == null) return '';
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('show'), 2000);
+  }
+</script>
+</body>
+</html>

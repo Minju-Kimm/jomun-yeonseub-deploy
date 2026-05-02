@@ -77,7 +77,7 @@
   .empty-state p { font-size: 15px; line-height: 1.7; }
 
   /* 생성 폼 */
-  .create-form-wrap { max-width: 680px; }
+  .create-form-wrap { max-width: 100%; }
   .create-form-wrap h2 { font-size: 26px; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 28px; }
   .form-group { margin-bottom: 20px; }
   .form-label { display: block; font-size: 13px; font-weight: 600; color: var(--text-sub); margin-bottom: 8px; }
@@ -211,6 +211,15 @@
   aside::-webkit-scrollbar-track { background: transparent; }
   aside::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
 
+  /* ===== 사이드바 데스크탑 토글 ===== */
+  .sidebar-toggle-desktop {
+    display: none; width: 36px; height: 36px;
+    background: transparent; border: 1.5px solid var(--border-strong);
+    border-radius: 10px; cursor: pointer; align-items: center; justify-content: center;
+    color: var(--text); flex-shrink: 0; margin-right: 4px; transition: background 0.15s;
+  }
+  .sidebar-toggle-desktop:hover { background: var(--border); }
+
   /* ===== MOBILE ELEMENTS ===== */
   .mobile-menu-btn {
     display: none; width: 40px; height: 40px;
@@ -221,7 +230,7 @@
   .mobile-menu-btn:hover { background: var(--border); }
   .sidebar-backdrop {
     display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,0.45); z-index: 49;
+    background: rgba(0,0,0,0.45); z-index: 100;
   }
   .sidebar-backdrop.open { display: block; animation: cbd 0.22s ease; }
   @keyframes cbd { from { opacity: 0; } to { opacity: 1; } }
@@ -255,7 +264,7 @@
       position: fixed !important;
       left: -100%; top: 0;
       width: min(300px, 84vw); height: 100vh; height: 100dvh;
-      z-index: 50; background: var(--bg-card);
+      z-index: 101; background: var(--bg-card);
       border-right: 1px solid var(--border-strong);
       overflow: hidden; padding: 0;
       padding-top: env(safe-area-inset-top);
@@ -297,13 +306,25 @@
     .article-body { font-size: 16px; }
     .article-card { padding: 20px 16px; }
   }
+  @media (min-width: 769px) {
+    .sidebar-toggle-desktop { display: flex; }
+    .layout.sidebar-collapsed { grid-template-columns: 0 1fr; }
+    .layout.sidebar-collapsed aside { width: 0; min-width: 0; overflow: hidden; border-right: none; padding: 0; }
+  }
 </style>
 </head>
 <body>
 
 <nav>
   <div class="nav-inner">
-    <a href="index.html" class="logo">산업재산권법 조문연습</a>
+    <div style="display:flex;align-items:center;gap:2px">
+      <button class="sidebar-toggle-desktop" id="sidebarToggleDesktop" title="사이드바 열기/닫기">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <a href="index.html" class="logo">산업재산권법 조문연습</a>
+    </div>
     <div class="nav-links">
       <a href="study.html">조문 암기</a>
       <a href="cards.html" class="active">커스텀 카드</a>
@@ -379,6 +400,7 @@
 
   let currentCreateType = 'fill-blank';
   let currentCardData = null; // OX/주관식 파싱된 데이터
+  let editingCardId = null;
 
   const searchInput = document.getElementById('searchInput');
 
@@ -505,53 +527,73 @@
     if (window.innerWidth <= 768) window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  // === 생성 폼 ===
-  function showCreateForm(prefillTitle = '') {
+  // === 생성 폼 (신규 또는 수정) ===
+  function showCreateForm(prefillTitle = '', prefillCard = null) {
+    const isEdit = !!prefillCard;
+    editingCardId = isEdit ? prefillCard.id : null;
     state.currentCardId = null;
     state.mode = 'create';
-    currentCreateType = 'fill-blank';
-    tblData = null; // 표 에디터 초기화
+    currentCreateType = isEdit ? (prefillCard.card_type || 'fill-blank') : 'fill-blank';
+
+    // 표 편집 시 기존 데이터 로드
+    if (isEdit && currentCreateType === 'table') {
+      tblData = parseTableData(prefillCard.body);
+    } else {
+      tblData = null;
+    }
+
+    // OX / 주관식 데이터 파싱
+    let pp = {};
+    if (isEdit && (currentCreateType === 'ox' || currentCreateType === 'subjective')) {
+      try { pp = JSON.parse(prefillCard.body); } catch {}
+    }
+
     renderCardList();
+
+    const titleValue = isEdit ? prefillCard.title : prefillTitle;
+    const formTitle = isEdit ? '카드 수정하기' : '새 카드 만들기';
+    const btnLabel = isEdit ? '수정 완료 →' : '저장하기 →';
+
+    const catOptions = ['판례', '학설', '기타'].map(v =>
+      `<option value="${v}" ${(isEdit ? prefillCard.category : '기타') === v ? 'selected' : ''}>${v}</option>`
+    ).join('');
 
     document.getElementById('mainArea').innerHTML = `
       <div class="create-form-wrap">
-        <h2>새 카드 만들기</h2>
+        <h2>${formTitle}</h2>
         <div id="createError" style="display:none;padding:12px 14px;background:var(--danger-sub);color:#B01826;border-radius:9px;font-size:14px;margin-bottom:16px;border:1px solid rgba(240,68,82,0.15);"></div>
 
         <div class="form-group">
           <label class="form-label">카드 유형</label>
           <div class="type-selector" id="typeSelector">
-            <button type="button" class="type-btn active" data-type="fill-blank">빈칸 채우기</button>
-            <button type="button" class="type-btn" data-type="ox">O/X 문제</button>
-            <button type="button" class="type-btn" data-type="subjective">주관식</button>
-            <button type="button" class="type-btn" data-type="table">표</button>
+            <button type="button" class="type-btn ${currentCreateType === 'fill-blank' ? 'active' : ''}" data-type="fill-blank" ${isEdit ? 'disabled' : ''}>빈칸 채우기</button>
+            <button type="button" class="type-btn ${currentCreateType === 'ox' ? 'active' : ''}" data-type="ox" ${isEdit ? 'disabled' : ''}>O/X 문제</button>
+            <button type="button" class="type-btn ${currentCreateType === 'subjective' ? 'active' : ''}" data-type="subjective" ${isEdit ? 'disabled' : ''}>주관식</button>
+            <button type="button" class="type-btn ${currentCreateType === 'table' ? 'active' : ''}" data-type="table" ${isEdit ? 'disabled' : ''}>표</button>
           </div>
+          ${isEdit ? '<div class="form-hint">수정 시 카드 유형은 변경할 수 없습니다.</div>' : ''}
         </div>
 
         <div class="form-group">
           <label class="form-label">제목</label>
-          <input class="form-input" id="newTitle" type="text" value="${escapeHtml(prefillTitle)}" placeholder="카드 제목">
+          <input class="form-input" id="newTitle" type="text" value="${escapeHtml(titleValue)}" placeholder="카드 제목">
         </div>
         <div class="form-group">
           <label class="form-label">카테고리</label>
-          <select class="form-select" id="newCategory">
-            <option value="판례">판례</option>
-            <option value="학설">학설</option>
-            <option value="기타" selected>기타</option>
-          </select>
+          <select class="form-select" id="newCategory">${catOptions}</select>
         </div>
 
         <!-- 빈칸 채우기 필드 -->
-        <div id="fillBlankFields">
+        <div id="fillBlankFields" ${currentCreateType !== 'fill-blank' ? 'style="display:none"' : ''}>
           <div class="form-group">
             <label class="form-label">내용</label>
-            <textarea class="form-textarea" id="newBody" placeholder="암기할 내용을 입력하세요. 저장 후 드래그로 빈칸을 만들 수 있습니다."></textarea>
+            <textarea class="form-textarea" id="newBody" placeholder="암기할 내용을 입력하세요. 저장 후 드래그로 빈칸을 만들 수 있습니다.">${isEdit && currentCreateType === 'fill-blank' ? escapeHtml(prefillCard.body) : ''}</textarea>
             <div class="form-hint">판례 요지, 학설 내용 등 자유롭게 입력하세요.</div>
           </div>
         </div>
 
         <!-- 표 필드 -->
-        <div id="tableFields" style="display:none">
+        <div id="tableFields" ${currentCreateType !== 'table' ? 'style="display:none"' : ''}>
           <div class="form-group">
             <label class="form-label">표 편집</label>
             <div class="table-editor-toolbar">
@@ -572,52 +614,57 @@
         </div>
 
         <!-- O/X 필드 -->
-        <div id="oxFields" style="display:none">
+        <div id="oxFields" ${currentCreateType !== 'ox' ? 'style="display:none"' : ''}>
           <div class="form-group">
             <label class="form-label">문제</label>
-            <textarea class="form-textarea" id="oxQuestion" placeholder="O 또는 X로 판단할 진술을 입력하세요." style="min-height:140px"></textarea>
+            <textarea class="form-textarea" id="oxQuestion" placeholder="O 또는 X로 판단할 진술을 입력하세요." style="min-height:140px">${isEdit && currentCreateType === 'ox' ? escapeHtml(pp.q || '') : ''}</textarea>
           </div>
           <div class="form-group">
             <label class="form-label">정답</label>
             <div class="ox-answer-select" id="oxAnswerSelect">
-              <button type="button" class="ox-pick active" data-val="O">O (옳음)</button>
-              <button type="button" class="ox-pick" data-val="X">X (틀림)</button>
+              <button type="button" class="ox-pick ${!isEdit || pp.a !== 'X' ? 'active' : ''}" data-val="O">O (옳음)</button>
+              <button type="button" class="ox-pick ${isEdit && pp.a === 'X' ? 'active' : ''}" data-val="X">X (틀림)</button>
             </div>
           </div>
           <div class="form-group">
             <label class="form-label">해설 <span style="font-weight:400;color:var(--text-mute)">(선택)</span></label>
-            <textarea class="form-textarea" id="oxExplanation" placeholder="정답 해설을 입력하세요. (선택 사항)" style="min-height:100px"></textarea>
+            <textarea class="form-textarea" id="oxExplanation" placeholder="정답 해설을 입력하세요. (선택 사항)" style="min-height:100px">${isEdit && currentCreateType === 'ox' ? escapeHtml(pp.e || '') : ''}</textarea>
           </div>
         </div>
 
         <!-- 주관식 필드 -->
-        <div id="subjectiveFields" style="display:none">
+        <div id="subjectiveFields" ${currentCreateType !== 'subjective' ? 'style="display:none"' : ''}>
           <div class="form-group">
             <label class="form-label">문제</label>
-            <textarea class="form-textarea" id="subjQuestion" placeholder="주관식 문제를 입력하세요." style="min-height:140px"></textarea>
+            <textarea class="form-textarea" id="subjQuestion" placeholder="주관식 문제를 입력하세요." style="min-height:140px">${isEdit && currentCreateType === 'subjective' ? escapeHtml(pp.q || '') : ''}</textarea>
           </div>
           <div class="form-group">
             <label class="form-label">모범 답안</label>
-            <textarea class="form-textarea" id="subjAnswerInput" placeholder="모범 답안을 입력하세요." style="min-height:140px"></textarea>
+            <textarea class="form-textarea" id="subjAnswerInput" placeholder="모범 답안을 입력하세요." style="min-height:140px">${isEdit && currentCreateType === 'subjective' ? escapeHtml(pp.a || '') : ''}</textarea>
           </div>
         </div>
 
         <div class="form-actions">
-          <button class="tool-btn primary" id="saveCardBtn">저장하기 →</button>
+          <button class="tool-btn primary" id="saveCardBtn">${btnLabel}</button>
           <button class="tool-btn" id="cancelCardBtn">취소</button>
         </div>
       </div>
     `;
 
-    // 유형 선택
-    document.querySelectorAll('#typeSelector .type-btn').forEach(btn => {
-      btn.onclick = () => {
-        document.querySelectorAll('#typeSelector .type-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentCreateType = btn.dataset.type;
-        updateCreateFormFields();
-      };
-    });
+    // 유형 선택 (신규만)
+    if (!isEdit) {
+      document.querySelectorAll('#typeSelector .type-btn').forEach(btn => {
+        btn.onclick = () => {
+          document.querySelectorAll('#typeSelector .type-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentCreateType = btn.dataset.type;
+          updateCreateFormFields();
+        };
+      });
+    }
+
+    // 표 에디터 초기화 (수정 시 기존 데이터 있으면 그대로)
+    if (currentCreateType === 'table') initTableEditor();
 
     // O/X 정답 선택
     document.querySelectorAll('#oxAnswerSelect .ox-pick').forEach(btn => {
@@ -638,6 +685,15 @@
     });
     document.getElementById('saveCardBtn').addEventListener('click', saveNewCard);
     document.getElementById('cancelCardBtn').addEventListener('click', cancelCreate);
+  }
+
+  // === 카드 수정 진입점 ===
+  function editCard(id) {
+    const card = findCard(id);
+    if (!card) return;
+    showCreateForm('', card);
+    if (window.innerWidth <= 768) closeSidebar();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function updateCreateFormFields() {
@@ -682,6 +738,30 @@
 
     if (!title) { showCreateError('제목을 입력해주세요.'); titleEl?.focus(); return; }
 
+    // ── 수정 모드 ──
+    if (editingCardId) {
+      saveBtn.disabled = true;
+      saveBtn.textContent = '수정 중...';
+      const { error } = await cardsAPI.update(editingCardId, { title, body, category, card_type: currentCreateType });
+      if (error) {
+        showCreateError('수정 실패: ' + (error?.message || '알 수 없는 오류'));
+        saveBtn.disabled = false;
+        saveBtn.textContent = '수정 완료 →';
+        return;
+      }
+      const idx = state.cards.findIndex(c => c.id === editingCardId);
+      if (idx >= 0) {
+        state.cards[idx] = { ...state.cards[idx], title, body, category, card_type: currentCreateType };
+      }
+      state.currentCardId = editingCardId;
+      editingCardId = null;
+      state.mode = 'edit';
+      renderCardList();
+      renderMain();
+      toast(`"${title}" 카드가 수정되었습니다`);
+      return;
+    }
+
     if (!state.isPremium && state.cards.length >= FREE_CARD_LIMIT) {
       const errorEl = document.getElementById('createError');
       errorEl.innerHTML = `무료 플랜은 최대 ${FREE_CARD_LIMIT}개 카드까지 만들 수 있습니다.<br>프리미엄으로 업그레이드하면 무제한으로 이용할 수 있어요. (<a href="account.html" style="color:var(--brand)">마이페이지 →</a>)`;
@@ -714,6 +794,7 @@
   }
 
   function cancelCreate() {
+    editingCardId = null;
     state.mode = 'edit';
     state.currentCardId = null;
     renderCardList();
@@ -755,6 +836,7 @@
             <button class="mode-btn ${state.mode === 'edit' ? 'active' : ''}" data-mode="edit">편집 모드</button>
             <button class="mode-btn ${state.mode === 'study' ? 'active' : ''}" data-mode="study" ${blankCount === 0 ? 'disabled' : ''}>암기 모드</button>
           </div>
+          <button class="tool-btn" onclick="editCard('${card.id}')">수정하기</button>
           <button class="tool-btn danger" onclick="deleteCard('${card.id}')">삭제</button>
         </div>
       </div>
@@ -851,6 +933,7 @@
             <button class="mode-btn ${state.mode === 'edit' ? 'active' : ''}" data-mode="edit">카드 보기</button>
             <button class="mode-btn ${state.mode === 'study' ? 'active' : ''}" data-mode="study">암기 모드</button>
           </div>
+          <button class="tool-btn" onclick="editCard('${card.id}')">수정하기</button>
           <button class="tool-btn danger" onclick="deleteCard('${card.id}')">삭제</button>
         </div>
       </div>
@@ -934,6 +1017,7 @@
             <button class="mode-btn ${state.mode === 'edit' ? 'active' : ''}" data-mode="edit">카드 보기</button>
             <button class="mode-btn ${state.mode === 'study' ? 'active' : ''}" data-mode="study">암기 모드</button>
           </div>
+          <button class="tool-btn" onclick="editCard('${card.id}')">수정하기</button>
           <button class="tool-btn danger" onclick="deleteCard('${card.id}')">삭제</button>
         </div>
       </div>
@@ -1009,6 +1093,7 @@
             <button class="mode-btn ${state.mode === 'edit' ? 'active' : ''}" data-mode="edit">편집 모드</button>
             <button class="mode-btn ${state.mode === 'study' ? 'active' : ''}" data-mode="study" ${blankCount === 0 ? 'disabled' : ''}>암기 모드</button>
           </div>
+          <button class="tool-btn" onclick="editCard('${card.id}')">수정하기</button>
           <button class="tool-btn danger" onclick="deleteCard('${card.id}')">삭제</button>
         </div>
       </div>
@@ -1477,6 +1562,7 @@
   }
 
   // 전역 노출
+  window.editCard = editCard;
   window.saveNewCard = saveNewCard;
   window.cancelCreate = cancelCreate;
   window.clearBlanks = clearBlanks;
@@ -1486,6 +1572,21 @@
   window.hideAll = hideAll;
   window.resetOX = resetOX;
   window.resetSubjective = resetSubjective;
+
+  // ===== 데스크탑 사이드바 토글 =====
+  (function() {
+    const btn = document.getElementById('sidebarToggleDesktop');
+    const layout = document.querySelector('.layout');
+    if (!btn || !layout) return;
+    if (localStorage.getItem('cards_sidebar_collapsed') === '1') {
+      layout.classList.add('sidebar-collapsed');
+    }
+    btn.onclick = () => {
+      layout.classList.toggle('sidebar-collapsed');
+      localStorage.setItem('cards_sidebar_collapsed',
+        layout.classList.contains('sidebar-collapsed') ? '1' : '0');
+    };
+  })();
 
   // ===== 모바일 사이드바 =====
   function openSidebar() {

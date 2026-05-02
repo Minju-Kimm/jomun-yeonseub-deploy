@@ -259,6 +259,83 @@ export const customCards = {
 };
 
 // ============================================================
+// 복습 카드 — Spaced Repetition System
+// ============================================================
+export const reviewCards = {
+  async getAll() {
+    const user = await auth.getUser();
+    if (!user) return [];
+    const { data, error } = await supabase
+      .from('review_cards')
+      .select('*')
+      .eq('user_id', user.id);
+    if (error) { console.warn('review_cards 조회 실패:', error.message); return []; }
+    return data || [];
+  },
+
+  async recordStudy(articleId, rating) {
+    const user = await auth.getUser();
+    if (!user) return { error: new Error('로그인이 필요합니다') };
+
+    const intervals = { again: 1, hard: 3, good: 7, easy: 14 };
+    const days = intervals[rating] ?? 1;
+    const nextReview = new Date();
+    nextReview.setDate(nextReview.getDate() + days);
+
+    const { data: existing } = await supabase
+      .from('review_cards')
+      .select('study_count')
+      .eq('user_id', user.id)
+      .eq('article_id', articleId)
+      .maybeSingle();
+
+    const studyCount = (existing?.study_count ?? 0) + 1;
+
+    const { error } = await supabase
+      .from('review_cards')
+      .upsert({
+        user_id: user.id,
+        article_id: articleId,
+        study_count: studyCount,
+        next_review_at: nextReview.toISOString(),
+        last_rating: rating,
+        last_studied_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'user_id,article_id' });
+
+    return { error, studyCount };
+  },
+};
+
+// ============================================================
+// 조문 오버라이드 — 관리자 전용 조문 수정/추가
+// ============================================================
+export const articleOverrides = {
+  async getAll() {
+    const { data, error } = await supabase
+      .from('article_overrides')
+      .select('*');
+    if (error) { console.warn('article_overrides 조회 실패:', error.message); return []; }
+    return data || [];
+  },
+
+  async upsert(fields) {
+    const { error } = await supabase
+      .from('article_overrides')
+      .upsert({ ...fields, updated_at: new Date().toISOString() }, { onConflict: 'article_id' });
+    return { error };
+  },
+
+  async remove(articleId) {
+    const { error } = await supabase
+      .from('article_overrides')
+      .delete()
+      .eq('article_id', articleId);
+    return { error };
+  },
+};
+
+// ============================================================
 // 학습 통계
 // ============================================================
 export const myStats = {

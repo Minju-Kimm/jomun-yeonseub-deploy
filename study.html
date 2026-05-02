@@ -56,6 +56,13 @@
   .nav-links { display: flex; gap: 24px; align-items: center; }
   .nav-links a { color: var(--text-sub); text-decoration: none; font-size: 15px; font-weight: 500; transition: color 0.15s; }
   .nav-links a:hover { color: var(--text); }
+  .sidebar-toggle-desktop {
+    display: none; width: 36px; height: 36px;
+    background: transparent; border: 1.5px solid var(--border-strong);
+    border-radius: 10px; cursor: pointer; align-items: center; justify-content: center;
+    color: var(--text); flex-shrink: 0; margin-right: 4px; transition: background 0.15s;
+  }
+  .sidebar-toggle-desktop:hover { background: var(--border); }
   .mobile-menu-btn {
     display: none;
     width: 40px; height: 40px;
@@ -74,7 +81,7 @@
   /* ===== SIDEBAR BACKDROP ===== */
   .sidebar-backdrop {
     display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,0.45); z-index: 49;
+    background: rgba(0,0,0,0.45); z-index: 100;
   }
   .sidebar-backdrop.open { display: block; animation: bdin 0.22s ease; }
   @keyframes bdin { from { opacity: 0; } to { opacity: 1; } }
@@ -298,7 +305,7 @@
     aside {
       position: fixed; left: -100%; top: 0;
       width: min(300px, 84vw); height: 100vh; height: 100dvh;
-      z-index: 50; background: var(--bg-card);
+      z-index: 101; background: var(--bg-card);
       border-right: 1px solid var(--border-strong);
       overflow: hidden; display: flex; flex-direction: column;
       transition: left 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.28s ease;
@@ -350,6 +357,64 @@
     .empty-state p { font-size: 14px; }
   }
 
+  /* ===== 데스크탑 사이드바 토글 ===== */
+  @media (min-width: 769px) {
+    .sidebar-toggle-desktop { display: flex; }
+    .layout.sidebar-collapsed { grid-template-columns: 0 1fr; }
+    .layout.sidebar-collapsed aside { width: 0; min-width: 0; overflow: hidden; border-right: none; padding: 0; }
+  }
+
+  /* ===== 복습 배지 ===== */
+  .review-due {
+    font-size: 10px; font-weight: 700;
+    padding: 2px 6px; border-radius: 4px;
+    background: #FFF0E0; color: #D4620A;
+    flex-shrink: 0; white-space: nowrap;
+  }
+  .study-count-badge {
+    font-size: 10px; font-weight: 700;
+    padding: 2px 6px; border-radius: 4px;
+    background: var(--brand-sub); color: var(--brand);
+    flex-shrink: 0;
+  }
+
+  /* ===== 평가 모달 ===== */
+  .rating-modal-overlay {
+    position: fixed; inset: 0; z-index: 200;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    background: rgba(0,0,0,0.5);
+    animation: fadeIn 0.18s ease;
+  }
+  .rating-modal-sheet {
+    background: white;
+    border-radius: 24px 24px 0 0;
+    padding: 28px 24px;
+    padding-bottom: max(28px, env(safe-area-inset-bottom));
+    animation: slideUp 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .rating-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;
+  }
+  .rating-btn {
+    padding: 16px 8px; border-radius: 14px;
+    font-size: 13px; font-weight: 700; cursor: pointer;
+    font-family: inherit; text-align: center; line-height: 1.4;
+    transition: transform 0.1s;
+  }
+  .rating-btn:hover { transform: scale(1.03); }
+  .rating-btn .rating-emoji { font-size: 22px; display: block; margin-bottom: 4px; }
+  .rating-again { border: 2px solid var(--danger); background: var(--danger-sub); color: var(--danger); }
+  .rating-hard  { border: 2px solid var(--accent-strong); background: var(--accent); color: #A07000; }
+  .rating-good  { border: 2px solid var(--brand); background: var(--brand-sub); color: var(--brand); }
+  .rating-easy  { border: 2px solid var(--success); background: var(--success-sub); color: #008050; }
+  .rating-skip  {
+    width: 100%; padding: 14px; border: none; border-radius: 12px;
+    background: var(--border); color: var(--text-sub); font-size: 14px;
+    font-weight: 600; cursor: pointer; font-family: inherit;
+  }
+
   /* ===== SMALL MOBILE ===== */
   @media (max-width: 480px) {
     .article-title-main { font-size: 20px; }
@@ -365,7 +430,14 @@
 
 <nav>
   <div class="nav-inner">
-    <a href="index.html" class="logo">산업재산권법 조문연습</a>
+    <div style="display:flex;align-items:center;gap:2px">
+      <button class="sidebar-toggle-desktop" id="sidebarToggleDesktop" title="사이드바 열기/닫기">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <a href="index.html" class="logo">산업재산권법 조문연습</a>
+    </div>
     <div class="nav-links">
       <a href="index.html">홈</a>
       <a href="cards.html">커스텀 카드</a>
@@ -440,15 +512,17 @@
     },
   };
 
-  let auth, blanksAPI, renderAuthNav, profileAPI;
+  let auth, blanksAPI, renderAuthNav, profileAPI, reviewCardsAPI, articleOverridesAPI;
   try {
     const mod = await import('./supabase-client.js');
     auth = mod.auth; blanksAPI = mod.blanks;
     renderAuthNav = mod.renderAuthNav; profileAPI = mod.profile;
+    reviewCardsAPI = mod.reviewCards; articleOverridesAPI = mod.articleOverrides;
   } catch(e) {
     console.warn('supabase-client.js 로드 실패 — 로컬 저장소 모드:', e.message);
     auth = authFallback; blanksAPI = blanksFallback;
     renderAuthNav = () => {}; profileAPI = null;
+    reviewCardsAPI = null; articleOverridesAPI = null;
   }
 
   renderAuthNav();
@@ -458,6 +532,7 @@
     currentLaw: 'patent', currentArticleId: null,
     articles: {}, mode: 'edit', blanks: {},
     isLoggedIn: false, isPremium: false,
+    reviews: {}, // keyed by article_id
   };
 
   // ===== 사이드바 =====
@@ -478,6 +553,21 @@
   document.getElementById('mobileMenuBtn').onclick = toggleSidebar;
   document.getElementById('sidebarBackdrop').onclick = closeSidebar;
   document.getElementById('sidebarCloseBtn').onclick = closeSidebar;
+
+  // ===== 데스크탑 사이드바 토글 =====
+  (function() {
+    const btn = document.getElementById('sidebarToggleDesktop');
+    const layout = document.querySelector('.layout');
+    if (!btn || !layout) return;
+    if (localStorage.getItem('study_sidebar_collapsed') === '1') {
+      layout.classList.add('sidebar-collapsed');
+    }
+    btn.onclick = () => {
+      layout.classList.toggle('sidebar-collapsed');
+      localStorage.setItem('study_sidebar_collapsed',
+        layout.classList.contains('sidebar-collapsed') ? '1' : '0');
+    };
+  })();
 
   // ===== 초기화 =====
   await initAuth();
@@ -503,13 +593,31 @@
   async function initAuth() {
     const user = await auth.getUser();
     state.isLoggedIn = !!user;
-    state.blanks = await blanksAPI.getAll();
-    state.isPremium = profileAPI ? await profileAPI.isPremium().catch(() => false) : false;
+
+    const loaders = [blanksAPI.getAll()];
+    if (user && reviewCardsAPI) loaders.push(reviewCardsAPI.getAll());
+    if (profileAPI) loaders.push(profileAPI.isPremium().catch(() => false));
+
+    const results = await Promise.all(loaders);
+    state.blanks = results[0];
+    let ri = 1;
+    if (user && reviewCardsAPI) {
+      for (const r of results[ri++] || []) state.reviews[r.article_id] = r;
+    }
+    state.isPremium = results[ri] ?? false;
+
     auth.onChange(async (event, newUser) => {
       const wasLoggedIn = state.isLoggedIn;
       state.isLoggedIn = !!newUser;
       if (wasLoggedIn !== state.isLoggedIn) {
         state.blanks = await blanksAPI.getAll();
+        if (newUser && reviewCardsAPI) {
+          const reviews = await reviewCardsAPI.getAll();
+          state.reviews = {};
+          for (const r of reviews) state.reviews[r.article_id] = r;
+        } else {
+          state.reviews = {};
+        }
         renderArticleList(document.getElementById('searchInput')?.value || '');
         renderContent();
       }
@@ -525,7 +633,27 @@
       try {
         const res = await fetch(`${slug}.json`);
         const data = await res.json();
-        state.articles[slug] = data.articles;
+        let articles = data.articles;
+
+        // 관리자 조문 오버라이드 적용
+        if (articleOverridesAPI) {
+          try {
+            const overrides = await articleOverridesAPI.getAll();
+            const overrideMap = {};
+            for (const o of overrides) overrideMap[o.article_id] = o;
+
+            articles = articles.map(a =>
+              overrideMap[a.id] ? { ...a, ...overrideMap[a.id], id: a.id } : a
+            );
+            for (const o of overrides) {
+              if (o.is_new && o.law_slug === slug && !articles.find(a => a.id === o.article_id)) {
+                articles.push({ id: o.article_id, ...o });
+              }
+            }
+          } catch {}
+        }
+
+        state.articles[slug] = articles;
       } catch(e) {
         list.innerHTML = '<li class="loading">불러오기 실패. 새로고침해 주세요.</li>';
         return;
@@ -551,11 +679,16 @@
       }
       const hasBlanks = state.blanks[art.id]?.length > 0;
       const isActive = art.id === state.currentArticleId;
+      const review = state.reviews[art.id];
+      const isDue = review && new Date(review.next_review_at) <= new Date();
+      const studyCount = review?.study_count || 0;
       html += `
         <li class="article-item ${isActive ? 'active' : ''}" data-id="${art.id}">
           <span class="article-num">${escapeHtml(art.number)}</span>
           <span class="article-title-sm">${escapeHtml(art.title)}</span>
           ${hasBlanks ? '<span class="has-blanks" title="빈칸 저장됨"></span>' : ''}
+          ${isDue ? '<span class="review-due" title="복습 필요">복습</span>' : ''}
+          ${studyCount > 0 && !isDue ? `<span class="study-count-badge">${studyCount}회</span>` : ''}
         </li>`;
     }
     if (!html) html = '<li class="loading">검색 결과 없음</li>';
@@ -612,8 +745,12 @@
           <span class="stat-value">${art.body.length}자</span>
         </div>
         <div class="stat-item">
-          <span class="stat-label">현재 모드</span>
-          <span class="stat-value brand">${state.mode === 'edit' ? '편집' : '암기'}</span>
+          <span class="stat-label">학습 횟수</span>
+          <span class="stat-value brand">${state.reviews[art.id]?.study_count || 0}회</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">다음 복습</span>
+          <span class="stat-value" style="font-size:13px">${state.reviews[art.id] ? formatNextReview(state.reviews[art.id].next_review_at) : '—'}</span>
         </div>
       </div>
 
@@ -794,8 +931,90 @@
       toast('먼저 편집 모드에서 빈칸을 만드세요');
       return;
     }
+    // 암기 → 편집 전환 시 복습 평가 모달 표시 (로그인 사용자 + 빈칸이 있는 경우)
+    if (mode === 'edit' && state.mode === 'study' && state.isLoggedIn && reviewCardsAPI) {
+      showRatingModal();
+      return;
+    }
     state.mode = mode;
     renderContent();
+  }
+
+  // ===== 복습 평가 모달 =====
+  function showRatingModal() {
+    const art = findArticle(state.currentArticleId);
+    if (!art) { state.mode = 'edit'; renderContent(); return; }
+
+    const sessionCount = (state.reviews[art.id]?.study_count || 0) + 1;
+
+    const overlay = document.createElement('div');
+    overlay.id = 'ratingModal';
+    overlay.className = 'rating-modal-overlay';
+    overlay.innerHTML = `
+      <div class="rating-modal-sheet">
+        <div style="text-align:center;margin-bottom:20px;">
+          <div style="font-size:12px;color:var(--text-mute);font-weight:700;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:6px;">학습 완료 — ${sessionCount}번째</div>
+          <div style="font-size:19px;font-weight:800;letter-spacing:-0.02em;">${escapeHtml(art.number)} ${escapeHtml(art.title)}</div>
+          <div style="font-size:14px;color:var(--text-sub);margin-top:8px;">이 조문을 얼마나 잘 외웠나요?</div>
+        </div>
+        <div class="rating-grid">
+          <button class="rating-btn rating-again" onclick="submitRating('again')">
+            <span class="rating-emoji">😟</span>못 외웠어<br><span style="font-size:11px;font-weight:500;opacity:0.8">1일 후 복습</span>
+          </button>
+          <button class="rating-btn rating-hard" onclick="submitRating('hard')">
+            <span class="rating-emoji">😓</span>어려웠어<br><span style="font-size:11px;font-weight:500;opacity:0.8">3일 후 복습</span>
+          </button>
+          <button class="rating-btn rating-good" onclick="submitRating('good')">
+            <span class="rating-emoji">😊</span>외웠어<br><span style="font-size:11px;font-weight:500;opacity:0.8">7일 후 복습</span>
+          </button>
+          <button class="rating-btn rating-easy" onclick="submitRating('easy')">
+            <span class="rating-emoji">🎉</span>완벽해<br><span style="font-size:11px;font-weight:500;opacity:0.8">14일 후 복습</span>
+          </button>
+        </div>
+        <button class="rating-skip" onclick="dismissRating()">건너뛰기</button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+  }
+
+  async function submitRating(rating) {
+    const id = state.currentArticleId;
+    document.getElementById('ratingModal')?.remove();
+
+    if (reviewCardsAPI && state.isLoggedIn) {
+      const result = await reviewCardsAPI.recordStudy(id, rating);
+      if (!result.error) {
+        const intervals = { again: 1, hard: 3, good: 7, easy: 14 };
+        const next = new Date();
+        next.setDate(next.getDate() + intervals[rating]);
+        state.reviews[id] = {
+          article_id: id,
+          study_count: result.studyCount,
+          next_review_at: next.toISOString(),
+          last_rating: rating,
+          last_studied_at: new Date().toISOString(),
+        };
+        renderArticleList(document.getElementById('searchInput')?.value || '');
+      }
+    }
+    state.mode = 'edit';
+    renderContent();
+  }
+
+  function dismissRating() {
+    document.getElementById('ratingModal')?.remove();
+    state.mode = 'edit';
+    renderContent();
+  }
+
+  function formatNextReview(isoStr) {
+    if (!isoStr) return '—';
+    const d = new Date(isoStr);
+    const now = new Date();
+    const diff = Math.round((d - now) / 86400000);
+    if (diff <= 0) return '오늘';
+    if (diff === 1) return '내일';
+    return `${diff}일 후`;
   }
 
   function revealAll() {
@@ -914,6 +1133,8 @@
   window.hideAll = hideAll;
   window.dismissSyncBanner = dismissSyncBanner;
   window.toggleSidebar = toggleSidebar;
+  window.submitRating = submitRating;
+  window.dismissRating = dismissRating;
 </script>
 </body>
 </html>
