@@ -226,12 +226,14 @@ export const customCards = {
     if (error) { console.warn('커스텀 카드 조회 실패:', error.message); return []; }
     return data || [];
   },
-  async create(title, body, category = '기타', cardType = 'fill-blank') {
+  async create(title, body, category = '기타', cardType = 'fill-blank', folderId = null) {
     const user = await auth.getUser();
     if (!user) return { data: null, error: new Error('로그인이 필요합니다') };
+    const row = { user_id: user.id, title, body, category, card_type: cardType };
+    if (folderId) row.folder_id = folderId;
     const { data, error } = await supabase
       .from('custom_cards')
-      .insert({ user_id: user.id, title, body, category, card_type: cardType })
+      .insert(row)
       .select()
       .single();
     return { data, error };
@@ -259,7 +261,7 @@ export const customCards = {
 };
 
 // ============================================================
-// 복습 카드 — Spaced Repetition System
+// 복습 카드 — 조문 SRS (Spaced Repetition)
 // ============================================================
 export const reviewCards = {
   async getAll() {
@@ -308,6 +310,38 @@ export const reviewCards = {
 };
 
 // ============================================================
+// 복습 주기 — 커스텀 카드 SM-2 알고리즘
+// ============================================================
+export const cardReviews = {
+  async getAll() {
+    const user = await auth.getUser();
+    if (!user) return [];
+    const { data, error } = await supabase
+      .from('card_reviews')
+      .select('*')
+      .eq('user_id', user.id);
+    if (error) { console.warn('리뷰 데이터 조회 실패:', error.message); return []; }
+    return data || [];
+  },
+  async save(cardId, next) {
+    const user = await auth.getUser();
+    if (!user) return { error: new Error('로그인이 필요합니다') };
+    const { error } = await supabase
+      .from('card_reviews')
+      .upsert({
+        user_id: user.id,
+        card_id: cardId,
+        ease_factor: next.ease_factor,
+        interval_days: next.interval_days,
+        repetitions: next.repetitions,
+        due_date: next.due_date,
+        last_reviewed_at: new Date().toISOString(),
+      }, { onConflict: 'user_id,card_id' });
+    return { error };
+  },
+};
+
+// ============================================================
 // 조문 오버라이드 — 관리자 전용 조문 수정/추가
 // ============================================================
 export const articleOverrides = {
@@ -331,6 +365,53 @@ export const articleOverrides = {
       .from('article_overrides')
       .delete()
       .eq('article_id', articleId);
+    return { error };
+  },
+};
+
+// ============================================================
+// 카드 폴더 유틸
+// ============================================================
+export const cardFolders = {
+  async getAll() {
+    const user = await auth.getUser();
+    if (!user) return [];
+    const { data, error } = await supabase
+      .from('card_folders')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: true });
+    if (error) { console.warn('폴더 조회 실패:', error.message); return []; }
+    return data || [];
+  },
+  async create(name) {
+    const user = await auth.getUser();
+    if (!user) return { data: null, error: new Error('로그인이 필요합니다') };
+    const { data, error } = await supabase
+      .from('card_folders')
+      .insert({ user_id: user.id, name })
+      .select()
+      .single();
+    return { data, error };
+  },
+  async rename(id, name) {
+    const user = await auth.getUser();
+    if (!user) return { error: new Error('로그인이 필요합니다') };
+    const { error } = await supabase
+      .from('card_folders')
+      .update({ name })
+      .eq('id', id)
+      .eq('user_id', user.id);
+    return { error };
+  },
+  async remove(id) {
+    const user = await auth.getUser();
+    if (!user) return { error: new Error('로그인이 필요합니다') };
+    const { error } = await supabase
+      .from('card_folders')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', user.id);
     return { error };
   },
 };
